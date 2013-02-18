@@ -22,12 +22,12 @@ def JointData():
   #stiffnessLists = [0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
   #timeLists = 2.0
   #motion.stiffnessInterpolation('LArm', stiffnessLists, timeLists) 
-  LShoulderPitch = mem.getData('Device/SubDeviceList/LShoulderPitch/Position/Actuator/Value')
-  LShoulderRoll = mem.getData('Device/SubDeviceList/LShoulderRoll/Position/Actuator/Value')
-  LElbowYaw = mem.getData('Device/SubDeviceList/LElbowYaw/Position/Actuator/Value')
-  LElbowRoll = mem.getData('Device/SubDeviceList/LElbowRoll/Position/Actuator/Value')
-  LWristYaw = mem.getData('Device/SubDeviceList/LWristYaw/Position/Actuator/Value')
-  LHand = mem.getData('Device/SubDeviceList/LHand/Position/Sensor/Value')
+  LShoulderPitch = mem.getData('Device/SubDeviceList/RShoulderPitch/Position/Sensor/Value')
+  LShoulderRoll = mem.getData('Device/SubDeviceList/RShoulderRoll/Position/Sensor/Value')
+  LElbowYaw = mem.getData('Device/SubDeviceList/RElbowYaw/Position/Sensor/Value')
+  LElbowRoll = mem.getData('Device/SubDeviceList/RElbowRoll/Position/Sensor/Value')
+  LWristYaw = mem.getData('Device/SubDeviceList/RWristYaw/Position/Sensor/Value')
+  LHand = mem.getData('Device/SubDeviceList/RHand/Position/Sensor/Value')
   # LHipYawPitch and RHipYawPitch share the same motor
   Hip = mem.getData('Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value')  
   
@@ -38,7 +38,7 @@ def HandData():
   # 0-torso, 1-world, 2-robot
   space = 0
   useSensorValues = True
-  return str(motion.getPosition("LArm", space, useSensorValues)) + "\t"
+  return str(motion.getPosition("RArm", space, useSensorValues)) + "\t"
 
 def BallData():
   if not redBallTracker.isActive():
@@ -47,7 +47,7 @@ def BallData():
   return str(redBallTracker.getPosition()) + "\n"
 
 ####### main function ######
-filename = 'data/data_' + str(time())
+filename = 'data_' + str(time())
 f = open(filename, 'w+')
 
 # set head stiffness for ball tracking
