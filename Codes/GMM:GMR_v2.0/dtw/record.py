@@ -60,7 +60,7 @@ while not headTouch():
   Data = JointData()+HandData()+BallData()
   print counter, Data
   counter += 1
-  f.write(Data)
+#  f.write(Data)
 f.close()
 
 #stop tracking
