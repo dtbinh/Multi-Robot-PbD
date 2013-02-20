@@ -52,6 +52,9 @@ f = open(filename, 'w+')
 
 # set head stiffness for ball tracking
 motion.setStiffnesses("Head", 1.0)
+#close hand
+motion.closeHand('RHand')
+motion.setStiffnesses("RHand", 0.8)
 # start traking
 redBallTracker.startTracker()
 
