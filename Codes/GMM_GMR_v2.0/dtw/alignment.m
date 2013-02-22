@@ -1,29 +1,37 @@
-demo1 = textread('demo_1');
-demo2 = textread('demo_2');
-demo3 = textread('demo_3');
+% Read raw data in Time*Dim format
 
-demo1 = demo1';
-demo2 = demo2';
-demo3 = demo3';
+%demo(:,:,1) = readRaw('../data/record_data_1361505493.53');  % reading data is Time * Dim
+%demo(:,:,2) = readRaw('../data/record_data_1361505493.53');
+%demo(:,:,3) = readRaw('../data/record_data_1361505493.53');
 
-[Dimension, Time] = size(demo1);
-for dim = 1:Dimension
-    [Dist, D, k, w,new] = dtwMD(demo1(dim,:),demo2(dim,:));
-   % figure;
-  %  plot(demo1(dim,:),'k*-'); hold on; plot(demo2(dim,:),'b.-'); hold on;plot(new,'ro-');
-    demo2(dim,:) = new;
+numDemo = 3;
+input = textread('demo_1');
+[Time, Dimension] = size(input);
+demo(Time, Dimension, numDemo) = 0;
+
+demo(:,:,1) = input;
+demo(:,:,2) = textread('demo_2');
+demo(:,:,3) = textread('demo_3');
+
+% select the refereced demo by number
+refnum = 1;
+Ref = demo(:,:,refnum);
+
+% align all other demo to reference demo
+for i = 1:numDemo
+    if i ~= refnum
+        [Dist, D, k, w,new] = dtwMD(Ref,demo(:, :, i));
+        % figure;
+        % plot(demo1(dim,:),'k*-'); hold on; plot(demo2(dim,:),'b.-'); hold on;plot(new,'ro-');
+    end
 end
 
-for dim = 1:size(demo1, 1)
-    [Dist, D, k, w,new] = dtwMD(demo1(dim,:),demo3(dim,:));
-%    figure;
- %   plot(demo1(dim,:),'k*-'); hold on; plot(demo3(dim,:),'b.-'); hold on;plot(new,'ro-');
-    demo3(dim,:) = new;
+% Assemble aligned demos to a file
+Data = demo(:,:,1);
+for i = 2:numDemo
+    Data = [Data; demo(:,:,i)];
 end
-t_step = 1:Time;
-demo1 = [t_step; demo1];
-demo2 = [t_step; demo2];
-demo3 = [t_step; demo3];
-Data = [demo1, demo2, demo3]';
 
-save('drawA_reprod.mat', 'Data');
+% Transpose to Dim * Tim for GMR
+Data = Data';
+save('../data/drawA_aligned.mat', 'Data');
