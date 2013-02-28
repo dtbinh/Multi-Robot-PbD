@@ -1,0 +1,7 @@
+recording/record.py				Record human demonstrations and write recorded data to ../data/record_data_TIME
+
+dtw/alignment.m						Read record_data_TIME and align all trajectories to a referenced trajectory, write aligned data to ../data/aligned_MOTIONNAME.mat
+
+GMM/demo1.m								Read aligned_MOTIONNAME.mat, do regression and save the reproduced result to ../data/reproduce_MOTIONNAME
+
+control/MOTION.py					Read reproduce_MOTIONNAME, control robot motion by the input joint angles
