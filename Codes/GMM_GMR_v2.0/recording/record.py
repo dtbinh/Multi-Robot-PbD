@@ -32,13 +32,13 @@ def JointData():
   Hip = mem.getData('Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value')  
   
   result = [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand, Hip]
-  return str(result) + "\t"
+  return str(result) + " "
 
 def HandData():
   # 0-torso, 1-world, 2-robot
   space = 0
   useSensorValues = True
-  return str(motion.getPosition("RArm", space, useSensorValues)) + "\t"
+  return str(motion.getPosition("RArm", space, useSensorValues)) + " "
 
 def BallData():
   if not redBallTracker.isActive():
@@ -47,14 +47,23 @@ def BallData():
   return str(redBallTracker.getPosition()) + "\n"
 
 ####### main function ######
-filename = '../record_data_' + str(time())
+filename = '../data/record_data_' + str(time())
 f = open(filename, 'w+')
 
 # set head stiffness for ball tracking
 motion.setStiffnesses("Head", 1.0)
 #close hand
-motion.closeHand('RHand')
-motion.setStiffnesses("RHand", 0.8)
+#motion.closeHand('RHand')
+motion.setAngles('RHand', 0.2, 0.2)
+motion.setStiffnesses("RHand", 1.0)
+# set lower body stiffness and fixed pose
+print "Leg angles:  ", motion.getAngles("RLeg", True)
+print "Leg angles:  ", motion.getAngles("LLeg", True)
+motion.setAngles("RLeg", [-0.02757003903388977, -0.001492038369178772, -1.5202360153198242, 0.8115279674530029, 0.42342597246170044, -0.001492038369178772], 0.1)
+motion.setAngles("RLeg", [-0.02757003903388977, -0.001492038369178772, -1.5202360153198242, 0.8115279674530029, 0.42342597246170044, -0.001492038369178772], 0.1)
+motion.setStiffnesses("RLeg", 1.0)
+motion.setStiffnesses("LLeg", 1.0)
+
 # start traking
 redBallTracker.startTracker()
 
@@ -63,7 +72,7 @@ while not headTouch():
   Data = JointData()+HandData()+BallData()
   print counter, Data
   counter += 1
-#  f.write(Data)
+  f.write(Data)
 f.close()
 
 #stop tracking
