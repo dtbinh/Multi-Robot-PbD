@@ -37,16 +37,18 @@ function demo1
 %   number="2",
 %   pages="286--298",
 % }
-
+clc;
+clear;
+path = '../data/B/';
 %% Definition of the number of components used in GMM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nbStates = 4;
+nbStates = 14;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load('../data/aligned_drawA.mat'); %load 'Data'
+load( strcat(path,'aligned.mat') ); %load 'Data'
 nbVar = size(Data,1);
-
+nbTime = size(Data,2)/3;
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Priors, Mu, Sigma] = EM_init_kmeans(Data, nbStates);
@@ -56,10 +58,41 @@ nbVar = size(Data,1);
 %% constraints. A sequence of temporal values is used as input, and the 
 %% expected distribution is retrieved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-expData(1,:) = linspace(min(Data(1,:)), max(Data(1,:)), 100);
+expData(1,:) = linspace(min(Data(1,:)), max(Data(1,:)), nbTime);
 [expData(2:nbVar,:), expSigma] = GMR(Priors, Mu, Sigma,  expData(1,:), [1], [2:nbVar]);
 
+%plot demonstration 3D trajectory of end-effector
+x=8;
+y=9;
+z=10;
+figure; 
+plot3(Data(x, 1:nbTime), Data(y, 1:nbTime), Data(z, 1:nbTime), 'r');
+hold on;
+plot3(Data(x, 1+nbTime:2*nbTime), Data(y, 1+nbTime:2*nbTime), Data(z, 1+nbTime:2*nbTime), 'b');
+hold on;
+plot3(Data(x, 2*nbTime+1:end), Data(y, 2*nbTime+1:end), Data(z, 2*nbTime+1:end), 'g');
+grid on;
+xlabel('x','fontsize',16); ylabel('y' ,'fontsize',16); zlabel('z','fontsize',16);
+
+%plot reproduced 3D trajectory of end-effector
+% figure;
+% 
+% plot3(expData(9,:), expData(9,:), expData(10,:));
+% grid on;
+%xlabel('x','fontsize',16); ylabel('y' ,'fontsize',16); zlabel('z','fontsize',16);
+
+%plot(expData(10,:), expData(11,:));
+
+%% Save data
+result = (expData(2:end,:))';
+save(strcat(path,'reproduced', 'result'))
+fName = strcat(path, 'reproduced.txt');         %# A file name
+fid = fopen(fName,'w');            %# Open the file
+dlmwrite(fName,result,'-append',...  %# Print the matrix
+         'delimiter','\t',...
+         'precision', 6);
 %% Plot of the data
+%{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('position',[10,10,1000,800],'name','GMM-GMR-demo1');
 %plot 1D
@@ -78,6 +111,7 @@ xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 %% Plot of the GMM encoding results
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %plot 1D
+
 for n=1:nbVar-1
   subplot(3*(nbVar-1),2,4+(n-1)*2+1); hold on;
   plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
@@ -108,3 +142,4 @@ xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 save('../data/reproduced_drawA', 'expData')
 pause;
 close all;
+    %}
