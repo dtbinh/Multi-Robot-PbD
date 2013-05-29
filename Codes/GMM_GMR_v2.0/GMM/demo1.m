@@ -44,7 +44,7 @@ nbStates = 4;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load('data/data1.mat'); %load 'Data'
+load('../data/aligned_drawA.mat'); %load 'Data'
 nbVar = size(Data,1);
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
@@ -105,5 +105,6 @@ plotGMM(expData([2,3],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
 axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
 xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 
+save('../data/reproduced_drawA', 'expData')
 pause;
 close all;

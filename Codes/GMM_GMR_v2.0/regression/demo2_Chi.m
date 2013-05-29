@@ -52,8 +52,8 @@ nbStates = 5;
 % load('data/data2_b.mat'); %load 'queryData'
 load('raw_all.mat');
 Data = raw_all';
-load('raw_5.mat')
-tmp=raw_5(:,9:14);
+load('raw_4.mat');
+tmp=raw_4(:,9:14);
 queryData = tmp';
 nbVar = size(Data,1);
 

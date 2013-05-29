@@ -1,9 +1,5 @@
 % Read raw data in Time*Dim format
 
-%demo(:,:,1) = readRaw('../data/record_data_1361505493.53');  % reading data is Time * Dim
-%demo(:,:,2) = readRaw('../data/record_data_1361505493.53');
-%demo(:,:,3) = readRaw('../data/record_data_1361505493.53');
-
 numDemo = 3;
 input = textread('demo_1');
 [Time, Dimension] = size(input);
@@ -22,7 +18,7 @@ for i = 1:numDemo
     if i ~= refnum
         [Dist, D, k, w,new] = dtwMD(Ref,demo(:, :, i));
         % figure;
-        % plot(demo1(dim,:),'k*-'); hold on; plot(demo2(dim,:),'b.-'); hold on;plot(new,'ro-');
+        % plot(demo(dim,:),'k*-'); hold on; plot(demo2(dim,:),'b.-'); hold on;plot(new,'ro-');
     end
 end
 
@@ -34,4 +30,4 @@ end
 
 % Transpose to Dim * Tim for GMR
 Data = Data';
-save('../data/drawA_aligned.mat', 'Data');
+save('../data/aligned_drawA.mat', 'Data');

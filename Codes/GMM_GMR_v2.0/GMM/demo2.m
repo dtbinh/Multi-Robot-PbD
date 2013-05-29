@@ -68,7 +68,7 @@ expData(1:2,:) = queryData;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('position',[10,10,1000,800],'name','GMM-GMR-demo2'); 
 subplot(3,1,1); hold on;
-plot(Data(1,:), Data(2,:), 'x', 'markerSize', 4, 'color', [.8 0 0]);
+plot(Data(1,:), Data(2,:), 'x', 'markerSize', 4, 'color', [.1 0 0]);
 plot(Data(3,:), Data(4,:), 'x', 'markerSize', 4, 'color', [0 .8 0]);
 axis([min([Data(1,:),Data(3,:)])-0.02 max([Data(1,:),Data(3,:)])+0.02 ...
   min([Data(2,:),Data(4,:)])-0.01 max([Data(2,:),Data(4,:)])+0.01]);
@@ -87,7 +87,7 @@ xlabel('x_1,x_3','fontsize',16); ylabel('x_2,x_4','fontsize',16);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subplot(3,1,3); hold on;
 plotGMM(expData([3,4],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
-plot(expData(1,:), expData(2,:), '-', 'lineWidth', 3, 'color', [0 0 .8]);
+plot(expData(1,:), expData(2,:), '-', 'lineWidth', 3, 'color', [0 0 .1]);
 axis([min([Data(1,:),Data(3,:)])-0.02 max([Data(1,:),Data(3,:)])+0.02 ...
   min([Data(2,:),Data(4,:)])-0.01 max([Data(2,:),Data(4,:)])+0.01]);
 xlabel('x_1,x_3','fontsize',16); ylabel('x_2,x_4','fontsize',16);
