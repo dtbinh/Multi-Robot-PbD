@@ -40,11 +40,12 @@ function demo1
 
 %% Definition of the number of components used in GMM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nbStates = 4;
+nbStates = 10;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load('../data/aligned_drawA.mat'); %load 'Data'
+load('aligned.mat'); %load 'Data'
+Data =aligned;
 nbVar = size(Data,1);
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
@@ -104,7 +105,11 @@ subplot(3*(nbVar-1),2,8+[2:2:2*(nbVar-1)]); hold on;
 plotGMM(expData([2,3],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
 axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
 xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
+figure;
+plot3(expData(9,:), expData(10,:),expData(11,:));grid on;
+figure;
+plot(expData(9,:), expData(10,:));grid on;
 
-save('../data/reproduced_drawA', 'expData')
+save('../data/wiping/expData.mat', 'expData')
 pause;
 close all;
