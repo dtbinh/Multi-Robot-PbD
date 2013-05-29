@@ -1,4 +1,4 @@
-function regression(numDemo)
+function test_pca(nbPC)
 %
 % Encoding and retrieval of motion in a latent space of reduced dimensionality.
 % This source code is the implementation of the algorithms described in 
@@ -44,18 +44,15 @@ function regression(numDemo)
 %% Definition of the number of components used in GMM and the number of 
 %% principal components.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nbStates = 10;
-nbPC = 2;
+nbStates = 4;
+%nbPC = 2;
+nbPC
 
 %% Load a dataset consisting of 3 demonstrations of a 4D signal 
 %% (3D spatial components + 1D temporal component).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load('aligned.mat');
-%time = repmat([1:size(raw_all, 1)/numDemo],1,numDemo)
-Data = aligned;
-%Data = aligned(1, :);
-%Data = [Data; aligned(8:13, :)];
-[nbVar,nbData] = size(Data)
+[nbVar,nbData] = size(Data);
 
 %% Projection of the data in a latent space using PCA.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,23 +68,20 @@ A = E(:,1:nbPC);
 nbVar2 = nbPC+1;
 Data2(1,:) = Data(1,:);
 Data2(2:nbVar2,:) = A' * centeredData;
-
+plot(Data2(2,:),'r*'); hold on; plot(Data2(3, :),'m*'); hold on; 
+plot(Data(2,:),'b-'); hold on; plot(Data(3, :),'k-'); hold on; plot(Data(4, :),'--cs','MarkerFaceColor','g'); hold on;
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Priors0, Mu0, Sigma0] = EM_init_kmeans(Data2, nbStates);
 [Priors2, Mu2, Sigma2] = EM(Data2, Priors0, Mu0, Sigma0);
 
-
 %% Re-project the GMM components in the original data space.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Project the centers of the Gaussian distributions, using only the spatial 
 %components 
 Mu(1,:) = Mu2(1,:);
-%Priors(1,:) = Priors2(1,:);
 Mu(2:nbVar,:) = A*Mu2(2:end,:) + Data_mean(:,1:nbStates);
-%Priors(2:nbVar,:) = A*Priors2(2:end,:) + Data_mean(:,1:nbStates);
-
 %Project the covariance matrices, using only the spatial components
 for i=1:nbStates
   A_tmp = [1 zeros(1,nbVar2-1); zeros(nbVar-1,1) A];
@@ -96,51 +90,28 @@ for i=1:nbStates
   Sigma(:,:,i) = Sigma(:,:,i) + 1E-10.*diag(ones(nbVar,1));
 end
 
-
-[PriorsX, MuX, SigmaX] = EM_init_kmeans(Data, nbStates);
-[Priors, Mu_useless, Sigma_useless] = EM(Data, PriorsX, MuX, SigmaX);
 %% Plot of the GMM encoding results.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('position',[50,50,1000,400]);
-% %plot 1D original data space
-% for n=1:nbVar-1
-%   subplot(nbVar-1,2,(n-1)*2+1); hold on;
-%   plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
-%   plot(Data(1,:), Data(n+1,:), 'x', 'markerSize', 4, 'color', [.1 .1 .1]);
-%   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
-%   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
-% end
-% %plot 1D latent space
-% for n=1:nbVar2-1
-%   subplot(nbVar-1,2,(n-1)*2+2); hold on;
-%   plotGMM(Mu2([1,n+1],:), Sigma2([1,n+1],[1,n+1],:), [.8 0 0], 1);
-%   plot(Data2(1,:), Data2(n+1,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
-%   axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
-%   xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
-% end
+%plot 1D original data space
+%for n=1:nbVar-1
+for n = 9:11
+  subplot(nbVar-1,2,(n-1)*2+1); hold on;
+  plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
+  plot(Data(1,:), Data(n+1,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
+  axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
+  xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
+end
+%plot 1D latent space
+nbVar2
+for n=1:nbVar2-1
+  %subplot(nbVar-1,2,(n-1)*2+2); hold on;
+  plotGMM(Mu2([1,n+1],:), Sigma2([1,n+1],[1,n+1],:), [.8 0 0], 1);
+  plot(Data2(1,:), Data2(n+1,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
+  axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
+  xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
+end
 %print('-depsc2','data/GMM-latentSpace-graph01.eps');
-
-
-expData(1,:) = linspace(min(Data(1,:)), max(Data(1,:)), max(Data(1,:)));
-[expData(2:nbVar,:), expSigma] = GMR(Priors , Mu, Sigma,  expData(1,:), [1], [2:nbVar]); %???
-
-%plot 1D
-figure;
-% for n=1:nbVar-1
-%     subplot(3*(nbVar-1),2,8+(n-1)*2+1); hold on;
-%     plotGMM(expData([1,n+1],:), expSigma(n,n,:), [0 0 .8], 3);
-%     axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
-%     xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
-% end
-%plot 2D
-%     subplot(3*(nbVar-1),2,8+[2:2:2*(nbVar-1)]); hold on;
-%     plotGMM(expData([2,3],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
-%     axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
-%     xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
-plot(Data(2, 1:123), Data(3, 1:123),'r');hold on,
-
-plot(expData(2, :), expData(3, :));
-save('expData.mat', 'expData');
 
 pause;
 close all;
