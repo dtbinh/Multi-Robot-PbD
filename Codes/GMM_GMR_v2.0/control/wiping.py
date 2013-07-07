@@ -53,20 +53,22 @@ def takePicture(robot, imgName):
 
 ####### main ########
 def wiping(IP, DEBUG):
-  ironhide = ROBOT(IP, 9559, 'R') 
+  print ">>> Start wiping"
+  
+  robot = ROBOT(IP, 9559, 'R') 
    
   #set stiffness
   names  = ["RArm", "LHipPitch", "RHipPitch"]
   stiffnessLists = 1.0
   timeLists = 2.0
-  ironhide.motion.stiffnessInterpolation(names, stiffnessLists, timeLists)
+  robot.motion.stiffnessInterpolation(names, stiffnessLists, timeLists)
 
   filename = "../data/wiping/reproduced.txt"
   f = open(filename)
   line = f.readlines()
   f.close
   
-  takePicture(ironhide, "before")
+  takePicture(robot, "before")
   
   for i in range(0, len(line)):
     targetAngle = []
@@ -77,7 +79,7 @@ def wiping(IP, DEBUG):
     if DEBUG:
       print "targetAngle:  ",targetAngle
     i = i + 1
-    if touchHead(ironhide):
+    if touchHead(robot):
       break
 
     joints = targetAngle[0:8]
@@ -85,12 +87,12 @@ def wiping(IP, DEBUG):
       print "joints ",joints
     # Using 10% of maximum joint speed
     maxSpeedFraction  = 0.1
-    ironhide.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+    robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
     #proxy.setAngles(names, joints, maxSpeedFraction) #angleInterpolationWithSpeed works better than setAngles, regarding the speed
 
-  takePicture(ironhide, "after")
+  takePicture(robot, "after")
   
   #ironhide.motion.openHand('LHand') 
-  ironhide.motion.setStiffnesses("Body", 0.0)
+  robot.motion.setStiffnesses("Body", 0.0)
  
-  print "Exit wiping normally"
+  print ">>> Exit wiping normally"

@@ -11,7 +11,7 @@ from compare import compare
 ####### main ########
 if __name__ == '__main__':
   ironhideIP = "10.26.210.60"
-  wiping(ironhideIP, False)
+  #wiping(ironhideIP, False)
 
   diff = compare()
 
