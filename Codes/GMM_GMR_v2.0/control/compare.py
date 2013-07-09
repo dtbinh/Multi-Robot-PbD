@@ -1,8 +1,9 @@
-import Image
-import ImageChops
+from PIL import Image
+import PIL.ImageChops
 import os, sys
 import math, operator
 import ImageFilter
+import pylab as pl
 
 def normalize(h):
   min_counter = -2
@@ -22,36 +23,52 @@ def normalize(h):
   print "max_scale: ", max_scale
   for scale, counter in enumerate(h):
     #print "original: ", scale, counter
-    if (counter != 0 and max_scale != scale):
+    if (scale < max_scale and scale > min_scale):
       scale = 255 * (scale-min_scale)/(max_scale - min_scale)
     result[scale] = counter
-    #print "new_scale: ", scale, counter
-  #for scale, counter in enumerate(h):
+  #  print "new_scale: ", scale, result[scale]
+  #for scale, counter in enumerate(result):
   #  print scale, counter
   return result
-	
+
+def plot(his, name):
+  fig = pl.figure()
+  ax = pl.subplot(111)
+  ax.bar(range(len(his)), his) 
+  fig.autofmt_xdate()  
+  pl.savefig("../data/wiping/img/" + name + ".png")
+  
+  	
 def compare():
   file1 = "../data/wiping/img/before.png"
   file2 = "../data/wiping/img/after.png"
 
-  im1 = Image.open(file1)
-  im2 = Image.open(file2)
+  img1 = Image.open(file1)
+  img2 = Image.open(file2)
 
-  h1 = im1.convert('L')
-  h2 = im2.convert('L')
+  invert1 = Image.eval(img1, lambda(x):255-x)
+  invert2 = Image.eval(img2, lambda(x):255-x)
+  invert1.save("../data/wiping/img/invert1.png")
+  invert2.save("../data/wiping/img/invert2.png")
+  
+  gray1 = invert1.convert('L')
+  gray2 = invert2.convert('L')
 	
-  h1.save("../data/wiping/img/h1.png")
-  h2.save("../data/wiping/img/h2.png")
+  gray1.save("../data/wiping/img/gray1.png")
+  gray2.save("../data/wiping/img/gray2.png")
 	
-  h1_his = h1.histogram()
-  h2_his = h2.histogram()
+  his1 = gray1.histogram()
+  his2 = gray2.histogram()
  
+  plot(his1, "his1")
+  plot(his2, "his2")
+  print "his diff before norm: ", math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1, his2))/len(his1))
   #print h1, h2 
-  h1_his_norm = normalize(h1_his)
-  h2_his_norm = normalize(h2_his)
+  his1_norm = normalize(his1)
+  his2_norm = normalize(his2)
   
-  h1.save("../data/wiping/img/h1_norm.png")
-  h2.save("../data/wiping/img/h2_norm.png")
+  plot(his1_norm, "his1_norm")
+  plot(his2_norm, "his2_norm")
   
-  rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
+  rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1_norm, his2_norm))/len(his1))
   return rms	
