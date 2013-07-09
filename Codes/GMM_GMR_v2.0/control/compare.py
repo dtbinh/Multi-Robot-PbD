@@ -32,7 +32,7 @@ def normalize(h):
   #  print scale, counter
   return result
 
-def plot(his, name):
+def plotLine(his, name):
   '''
   fig = pl.figure()
   ax = pl.subplot(111)
@@ -45,7 +45,13 @@ def plot(his, name):
   ax.plot(range(len(his)), his) 
   fig.autofmt_xdate()  
   plt.savefig("../data/wiping/img/"+ name + "_line.png") 
-  	
+  
+def saveFile(data, filename):
+  f = open("../data/wiping/img/"+filename, "w")
+  for item in data:
+    f.write("%s\n" % item)
+  f.close()
+
 def compare():
   file1 = "../data/wiping/img/before.png"
   file2 = "../data/wiping/img/after.png"
@@ -67,9 +73,13 @@ def compare():
   #for index, value in enumerate(his2):
   #  print index, value
     
-  #plot(his1, "his1")
-  #plot(his2, "his2") 
+  #plotLine(his1, "his1")
+  #plotLine(his2, "his2") 
   #print "his1:  ", his1, "\nhis2:  ",his2
+  his1 = normalize(his1) 
+  his2 = normalize(his2) 
+  saveFile(his1, "his1.txt")  
+  saveFile(his2, "his2.txt")  
   
   rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1, his2))/len(his1))
   return rms	

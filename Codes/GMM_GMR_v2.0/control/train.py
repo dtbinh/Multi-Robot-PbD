@@ -11,7 +11,10 @@ from compare import compare
 ####### main ########
 if __name__ == '__main__':
   ironhideIP = "10.26.210.60"
+  bumblebeeIP = "10.26.210.59"
+
   #wiping(ironhideIP, False)
+  #wiping(bumblebeeIP, False)
 
   diff = compare()
 

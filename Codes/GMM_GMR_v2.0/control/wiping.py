@@ -59,15 +59,19 @@ def wiping(IP, DEBUG):
    
   #set stiffness
   names  = ["RArm", "LHipPitch", "RHipPitch"]
+  '''
+  names_stiff  = ["RArm", "LHipPitch", "RHipPitch", "Head"]
   stiffnessLists = 1.0
   timeLists = 2.0
-  robot.motion.stiffnessInterpolation(names, stiffnessLists, timeLists)
+  robot.motion.stiffnessInterpolation(names_stiff, stiffnessLists, timeLists)
+  '''
+  robot.motion.setStiffnesses("Body", 1.0)
 
   filename = "../data/wiping/reproduced.txt"
   f = open(filename)
   line = f.readlines()
   f.close
-  
+  time.sleep(1)
   takePicture(robot, "before")
   
   for i in range(0, len(line)):
@@ -90,6 +94,7 @@ def wiping(IP, DEBUG):
     robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
     #proxy.setAngles(names, joints, maxSpeedFraction) #angleInterpolationWithSpeed works better than setAngles, regarding the speed
 
+  time.sleep(1)
   takePicture(robot, "after")
   
   #ironhide.motion.openHand('LHand') 
