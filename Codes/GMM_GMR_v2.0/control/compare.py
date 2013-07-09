@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from PIL import Image
 import PIL.ImageChops
 import os, sys
@@ -32,12 +33,18 @@ def normalize(h):
   return result
 
 def plot(his, name):
+  '''
   fig = pl.figure()
   ax = pl.subplot(111)
   ax.bar(range(len(his)), his) 
   fig.autofmt_xdate()  
   pl.savefig("../data/wiping/img/" + name + ".png")
-  
+  '''
+  fig = plt.figure()
+  ax = plt.subplot(111)
+  ax.plot(range(len(his)), his) 
+  fig.autofmt_xdate()  
+  plt.savefig("../data/wiping/img/"+ name + "_line.png") 
   	
 def compare():
   file1 = "../data/wiping/img/before.png"
@@ -48,27 +55,21 @@ def compare():
 
   invert1 = Image.eval(img1, lambda(x):255-x)
   invert2 = Image.eval(img2, lambda(x):255-x)
-  invert1.save("../data/wiping/img/invert1.png")
-  invert2.save("../data/wiping/img/invert2.png")
   
   gray1 = invert1.convert('L')
   gray2 = invert2.convert('L')
 	
-  gray1.save("../data/wiping/img/gray1.png")
-  gray2.save("../data/wiping/img/gray2.png")
-	
   his1 = gray1.histogram()
   his2 = gray2.histogram()
- 
-  plot(his1, "his1")
-  plot(his2, "his2")
-  print "his diff before norm: ", math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1, his2))/len(his1))
-  #print h1, h2 
-  his1_norm = normalize(his1)
-  his2_norm = normalize(his2)
   
-  plot(his1_norm, "his1_norm")
-  plot(his2_norm, "his2_norm")
+  #for index, value in enumerate(his1):
+  #  print index, value
+  #for index, value in enumerate(his2):
+  #  print index, value
+    
+  #plot(his1, "his1")
+  #plot(his2, "his2") 
+  #print "his1:  ", his1, "\nhis2:  ",his2
   
-  rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1_norm, his2_norm))/len(his1))
+  rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, his1, his2))/len(his1))
   return rms	
