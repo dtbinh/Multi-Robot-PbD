@@ -39,7 +39,7 @@ def takePicture(robot, imgName):
     t0 = time.time()
     naoImage = robot.camera.getImageRemote(videoClient) 
     t1 = time.time()
-    print "acquistion delay", t1 - t0
+    print "\t\tacquistion delay", t1 - t0
     robot.camera.unsubscribe(videoClient)
 
     imageWidth = naoImage[0]
@@ -52,7 +52,7 @@ def takePicture(robot, imgName):
     print ">>> Finish taking picture"
 
 def action(IP, DEBUG, action_name):
-  print ">>> Start wiping"
+  print ">>> Start ", action_name
   
   robot = ROBOT(IP, 9559, 'R') 
    
@@ -61,7 +61,7 @@ def action(IP, DEBUG, action_name):
   robot.motion.setStiffnesses("Body", 1.0)
 
   #read traj
-  filename = "../data/", action_name,"/reproduced.txt"
+  filename = "../data/"+ action_name +"/reproduced.txt"
   f = open(filename)
   line = f.readlines()
   f.close
