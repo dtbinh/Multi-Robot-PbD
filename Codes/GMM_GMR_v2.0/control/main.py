@@ -3,4 +3,4 @@ import os, sys
 
 if __name__ == "__main__":
   result = compare()
-  print "result: ", result
+  print "compared result: ", result
