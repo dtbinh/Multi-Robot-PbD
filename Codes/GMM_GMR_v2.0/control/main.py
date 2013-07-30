@@ -4,6 +4,6 @@ from action import action
 
 if __name__ == "__main__":
   ironhide = "10.26.210.60"
-  action(ironhide, False, "wiping")
+  action(ironhide, False, "picking")
   diff = compare()
   print "compared difference: ", diff
