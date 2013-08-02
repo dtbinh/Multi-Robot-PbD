@@ -1,96 +1,82 @@
-import os
-import sys
-import time
-from naoqi import ALProxy
-import vision_definitions
-import Image
-
-from compare import compare
+from robot import *
+from mlabwrap import mlab
  
-class  ROBOT():
-  def __init__(self, ip, port, side):
-    self.ip = ip
-    self.port = port
-    try:
-      self.motion = ALProxy("ALMotion", self.ip, self.port)
-      self.memory = ALProxy('ALMemory', self.ip, self.port)
-      self.camera = ALProxy("ALVideoDevice", self.ip, self.port)
-      self.speech = ALProxy("ALTextToSpeech", self.ip, self.port)
-    except Exception, e:
-      print "Could not create proxy"
-      print "Error: ", e
-      sys.exit(1)
+def test_move(action_name, robot):
+  filename = "../data/" + action_name + "/reproduced.txt"
+  f = open(filename)
+  line = f.readlines()
+  f.close
+  for i in range(0, len(line)):
+    target = []
+    target = line[i].split("\t")
+    target = map(float, target) 
+    joints = target[0:8] 
+    speed = 0.1
+    names  = ["RArm", "LHipPitch", "RHipPitch"]
+    robot.motion.angleInterpolationWithSpeed(names, joints, speed)
+    i = i + 1
+    if robot.headTouch():
+      break 
 
-    #select mouth camera
-    self.camera.setParam(18, 1) 
-def touchHead(robot):
-  headFront = robot.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value')
-  headMiddle = robot.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
-  headRear = robot.memory.getData('Device/SubDeviceList/Head/Touch/Rear/Sensor/Value')
-  return headFront or headMiddle or headRear
-
-def takePicture(robot, imgName):
-    print ">>> Start taking picture: ", imgName
-    resolution = 2 #VGA, higher than kQQVGA
-    colorSpace = 11 #RGB
-    videoClient = robot.camera.subscribe("python_client", resolution, colorSpace, 5)
+def move(robot):
+  robot.mouthCam()
+  robot.redballtracker.startTracker()
+  
+  # main loop
+  step = 0
+  ballx = 0
+  bally = 0
+  ballz = 0
+  while (step < 100):
+    if robot.headTouch():
+      break
+    robot.mouthCam() 
     
-    time.sleep(1)
-    t0 = time.time()
-    naoImage = robot.camera.getImageRemote(videoClient) 
-    t1 = time.time()
-    print "\t\tacquistion delay", t1 - t0
-    robot.camera.unsubscribe(videoClient)
+    #check if traker works
+    while not robot.redballtracker.isActive():
+      robot.redballtracker.startTracker()
+      print "Tracker failed, try again"
+      robot.speech.say("Tracker failed, try again.")
+    
+    #check if traker lost ball 
+    newx, newy, newz = robot.redballtracker.getPosition()
+    if (newx - ballx) < 0.01 and (newy - bally) < 0.01 and (newz - ballz) < 0.01:
+        robot.speech.say("lost ball")
+	robot.searchBall()
 
-    imageWidth = naoImage[0]
-    imageHeight = naoImage[1]
-    array = naoImage[6]
-    im = Image.fromstring("RGB", (imageWidth, imageHeight), array)
-
-    im.save("../data/wiping/img/"+imgName+".png", "PNG")
-    im.show()
-    print ">>> Finish taking picture"
+    ballx, bally, ballz = robot.redballtracker.getPosition() 
+    ballPos = [ballx, bally, ballz]
+    print "\n\nball position: ", ballPos
+     
+    output = mlab.GMR([ballx, bally, ballz])
+    joints = [] 
+    for index, item in enumerate(output[0:8]):
+      joints.append(float(item))
+    print "joints: ", joints
+    
+    # check if joints legal and move
+    if all(jvalue == 0 for jvalue in joints) or all(bvalue == 0 for bvalue in ballPos):
+      robot.speech.say("illegal ball position")
+      robot.searchBall()
+    else:
+      robot.speech.say("going to move")
+      sleep(2)
+      maxSpeedFraction  = 0.1
+      names  = ["RArm", "LHipPitch", "RHipPitch"]
+      #robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+    
+    step = step + 1
 
 def action(IP, DEBUG, action_name):
   print ">>> Start ", action_name
-  
   robot = ROBOT(IP, 9559, 'R') 
-   
+  robot.mouthCam() 
   #set stiffness
   names  = ["RArm", "LHipPitch", "RHipPitch"]
   robot.motion.setStiffnesses("Body", 1.0)
 
-  #read traj
-  filename = "../data/"+ action_name +"/reproduced.txt"
-  f = open(filename)
-  line = f.readlines()
-  f.close
-  time.sleep(1)
-  takePicture(robot, "before")
- 
-  #take action 
-  for i in range(0, len(line)):
-    targetAngle = []
-    targetAngle = line[i].split('\t')
-    targetAngle = map(float, targetAngle)
-    targetAngle[5] = 0.0  #hand close
-    if DEBUG:
-      print "targetAngle:  ",targetAngle
-    i = i + 1
-    if touchHead(robot):
-      break
-
-    joints = targetAngle[0:8]
-    if DEBUG:
-      print "joints ",joints
-    # Using 10% of maximum joint speed
-    maxSpeedFraction  = 0.1
-    robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
-
-  time.sleep(1)
-  takePicture(robot, "after")
-  
-  #ironhide.motion.openHand('LHand') 
-  robot.motion.setStiffnesses("Body", 0.0)
+  #test_move(action_name, robot)
+  move(robot)
+  robot.exit()
  
   print ">>> Exit ", action_name, " normally"
