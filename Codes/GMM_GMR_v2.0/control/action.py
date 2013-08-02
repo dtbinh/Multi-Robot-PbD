@@ -27,7 +27,7 @@ def move(robot):
   ballx = 0
   bally = 0
   ballz = 0
-  while (step < 100):
+  while (step < 5):
     if robot.headTouch():
       break
     robot.mouthCam() 
@@ -43,11 +43,21 @@ def move(robot):
     if (newx - ballx) < 0.01 and (newy - bally) < 0.01 and (newz - ballz) < 0.01:
         robot.speech.say("lost ball")
 	robot.searchBall()
-
-    ballx, bally, ballz = robot.redballtracker.getPosition() 
-    ballPos = [ballx, bally, ballz]
-    print "\n\nball position: ", ballPos
-     
+    sumx = 0.0
+    sumy = 0.0
+    sumz = 0.0
+    for i in range(1,101):
+      robot.mouthCam() 
+      
+      ballx, bally, ballz = robot.redballtracker.getPosition() 
+      sumx = sumx+ballx
+      sumy = sumy+bally
+      sumz = sumz+ballz
+    sumx = sumx / 100
+    sumy = sumy / 100
+    sumz = sumz / 100
+    print "\n\nball position: ", ballx, bally, ballz
+    ballPos = [ballx, bally, ballz] 
     output = mlab.GMR([ballx, bally, ballz])
     joints = [] 
     for index, item in enumerate(output[0:8]):
@@ -58,12 +68,14 @@ def move(robot):
     if all(jvalue == 0 for jvalue in joints) or all(bvalue == 0 for bvalue in ballPos):
       robot.speech.say("illegal ball position")
       robot.searchBall()
+    elif (ballx > 1.0 or bally > 1.0 or ballz > 1.0):
+      robot.speech.say("ball out of range")
     else:
       robot.speech.say("going to move")
       sleep(2)
       maxSpeedFraction  = 0.1
       names  = ["RArm", "LHipPitch", "RHipPitch"]
-      #robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+      robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
     
     step = step + 1
 

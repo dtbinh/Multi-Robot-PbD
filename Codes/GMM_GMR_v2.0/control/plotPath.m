@@ -13,7 +13,7 @@ hold on;
 
 
 x = ball_record;
-x(1,:) = x(1, :) - 0.3;
+x(1,:) = x(1, :) - 1;
 y = GMR(x);
 
 hand_regress = y(9:11, :);

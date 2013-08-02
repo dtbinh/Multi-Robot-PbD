@@ -1,4 +1,4 @@
-function [Priors, Mu, Sigma] = model()
+function [Priors, Mu, Sigma] = model(filename)
 %
 % Demo of the spatial Gaussian Mixture Regression (GMR) using query points 
 % of arbitrary dimensions. 
@@ -50,7 +50,7 @@ nbStates = 10;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load('data/data2_a.mat'); %load 'Data'
 % load('data/data2_b.mat'); %load 'queryData'
-load('data/raw_all.mat');
+load(filename);
 tmp = raw_all';
 Data=tmp;
 nbVar = size(Data,1);

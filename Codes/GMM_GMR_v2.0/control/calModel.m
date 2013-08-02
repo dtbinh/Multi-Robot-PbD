@@ -10,7 +10,7 @@ function calModel()
                     %+ 6 end effector = 14
     
     read(path, numDemo, numDim);   
-    [Priors, Mu, Sigma] = model();
+    [Priors, Mu, Sigma] = model('data/raw_all.mat');
     save('data/Priors.mat', 'Priors');
     save('data/Mu.mat', 'Mu');
     save('data/Sigma.mat', 'Sigma');
