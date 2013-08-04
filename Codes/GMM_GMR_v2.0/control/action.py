@@ -15,11 +15,15 @@ def test_move(action_name, robot):
     names  = ["RArm", "LHipPitch", "RHipPitch"]
     robot.motion.angleInterpolationWithSpeed(names, joints, speed)
     i = i + 1
-    if robot.headTouch():
-      break 
+    robot.headTouch()
+     
 
 def move(robot):
-  robot.mouthCam()
+  #set stiffness
+  robot.motion.openHand("RHand")
+  names  = ["RArm", "LHipPitch", "RHipPitch"]
+  robot.motion.setStiffnesses("Body", 1.0)
+
   robot.redballtracker.startTracker()
   
   # main loop
@@ -27,9 +31,10 @@ def move(robot):
   ballx = 0
   bally = 0
   ballz = 0
-  while (step < 5):
-    if robot.headTouch():
-      break
+  while (step < 4):
+    robot.headTouch()
+      
+
     robot.mouthCam() 
     
     #check if traker works
@@ -37,7 +42,7 @@ def move(robot):
       robot.redballtracker.startTracker()
       print "Tracker failed, try again"
       robot.speech.say("Tracker failed, try again.")
-    
+    robot.searchBall() 
     #check if traker lost ball 
     newx, newy, newz = robot.redballtracker.getPosition()
     if (newx - ballx) < 0.01 and (newy - bally) < 0.01 and (newz - ballz) < 0.01:
@@ -46,16 +51,16 @@ def move(robot):
     sumx = 0.0
     sumy = 0.0
     sumz = 0.0
-    for i in range(1,101):
+    for i in range(1,201):
       robot.mouthCam() 
       
       ballx, bally, ballz = robot.redballtracker.getPosition() 
       sumx = sumx+ballx
       sumy = sumy+bally
       sumz = sumz+ballz
-    sumx = sumx / 100
-    sumy = sumy / 100
-    sumz = sumz / 100
+    sumx = sumx / 200
+    sumy = sumy / 200
+    sumz = sumz / 200
     print "\n\nball position: ", ballx, bally, ballz
     ballPos = [ballx, bally, ballz] 
     output = mlab.GMR([ballx, bally, ballz])
@@ -67,7 +72,7 @@ def move(robot):
     # check if joints legal and move
     if all(jvalue == 0 for jvalue in joints) or all(bvalue == 0 for bvalue in ballPos):
       robot.speech.say("illegal ball position")
-      robot.searchBall()
+      #robot.searchBall()
     elif (ballx > 1.0 or bally > 1.0 or ballz > 1.0):
       robot.speech.say("ball out of range")
     else:
@@ -75,20 +80,7 @@ def move(robot):
       sleep(2)
       maxSpeedFraction  = 0.1
       names  = ["RArm", "LHipPitch", "RHipPitch"]
-      robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+      #robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
     
     step = step + 1
 
-def action(IP, DEBUG, action_name):
-  print ">>> Start ", action_name
-  robot = ROBOT(IP, 9559, 'R') 
-  robot.mouthCam() 
-  #set stiffness
-  names  = ["RArm", "LHipPitch", "RHipPitch"]
-  robot.motion.setStiffnesses("Body", 1.0)
-
-  #test_move(action_name, robot)
-  move(robot)
-  robot.exit()
- 
-  print ">>> Exit ", action_name, " normally"

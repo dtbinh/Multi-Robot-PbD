@@ -15,39 +15,52 @@ class ROBOT():
     self.speech = ALProxy('ALTextToSpeech', self.ip, self.port)
 	
   def searchBall(self):
+    self.motion.setStiffnesses("Head", 1.0)
     self.mouthCam()
     sleep(1)
-    self.motion.setStiffnesses("Head", 1.0)
+    self.redballtracker.stopTracker()
+    sleep(1)
     self.redballtracker.startTracker()
-
+    print self.redballtracker.getPosition()
     if not self.redballtracker.isActive():
       self.speech.say('Can not start tracking')
       self.exit()
-    #[ballx, bally, ballz] = self.redballtracker.getPosition()
-    angle = 0.4
+    
+    angle = 0.5
     speed = 0.1
-    while(1):
+    while True:
       self.mouthCam()
-      self.speech.say("Search ball")
-      self.motion.setAngles("HeadYaw", angle, speed)
-      if self.redballtracker.isNewData():
-        break
+      if not self.redballtracker.isActive():
+        self.speech.say('Can not start tracking')
+        self.exit()
+      self.speech.say("Search")
+      
+      self.motion.setAngles("HeadYaw", 0.5, speed)
       sleep(2)
-      self.motion.setAngles("HeadPitch", angle, speed)
       if self.redballtracker.isNewData():
-        break
+        self.speech.say("new ball, start tracking")
+        break 
+      
+      self.motion.setAngles("HeadPitch", 0.2, speed)
       sleep(2)
-      self.motion.setAngles("HeadYaw", -angle, speed)
       if self.redballtracker.isNewData():
-        break
+        self.speech.say("new ball, start tracking") 
+        break 
+      
+      self.motion.setAngles("HeadYaw", -0.5, speed)
       sleep(2)
-      self.motion.setAngles("HeadPitch", -angle, speed)
       if self.redballtracker.isNewData():
-        break
+        self.speech.say("new ball, start tracking") 
+        break 
+      
+      self.motion.setAngles("HeadPitch", -0.2, speed)
       sleep(2)
+      if self.redballtracker.isNewData():
+        self.speech.say("new ball, start tracking") 
+        break 
       if self.headTouch():
-        break
-    self.speech.say("Find ball, start tracking") 
+	break
+   
 
   def pickBall(self):
     headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value') 
@@ -55,15 +68,21 @@ class ROBOT():
       self.motion.closeHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
       self.speech.say("Pick ball") 
+
   def dropBall(self):
     headRear = self.memory.getData('Device/SubDeviceList/Head/Touch/Rear/Sensor/Value')
     if headRear:
       self.motion.openHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
       self.speech.say("Drop ball")
+  
   def headTouch(self):
     headMiddle = self.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
-    return headMiddle
+    if headMiddle:
+      self.speech.say("Touch stop")
+      return True
+    else:
+      return False
 
   def JointData(self):
     ShoulderPitch = self.memory.getData('Device/SubDeviceList/'+self.side+'ShoulderPitch/Position/Sensor/Value')
@@ -98,7 +117,8 @@ class ROBOT():
 
   def exit(self):
     try:
-      self.redballtracker.stopTracker()
+      while self.redballtracker.isActive():
+        self.redballtracker.stopTracker()
     except Exception,e:
       self.speech.say('Cannot stop tracking')      
     try:
