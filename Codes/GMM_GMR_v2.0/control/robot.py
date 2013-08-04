@@ -108,7 +108,19 @@ class ROBOT():
       print "Tracker is not active."
       self.speech.say('Fail tracking')
       self.exit()
-    return str(self.redballtracker.getPosition()) 
+    sumx = 0
+    sumy = 0
+    sumz = 0
+    for i in range(1, 101):
+      ballx, bally, ballz = self.redballtracker.getPosition()
+      sumx = sumx + ballx
+      sumy = sumy + bally
+      sumz = sumz + ballz
+    sumx = sumx / 100
+    sumy = sumy / 100
+    sumz = sumz / 100
+    
+    return str([sumx, sumy, sumz]) 
   
   def mouthCam(self):
     while self.camera.getParam(18) == 0:

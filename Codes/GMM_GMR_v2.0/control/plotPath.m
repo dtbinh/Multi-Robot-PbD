@@ -1,7 +1,7 @@
 function plotPath
-load('data/raw_2.mat');
+load('data/raw_1.mat');
 
-tmp = raw_2';
+tmp = raw_1';
 hand_record = tmp(12:14, :);
 ball_record = tmp(1:3, :);
 max(ball_record')
@@ -13,7 +13,7 @@ hold on;
 
 
 x = ball_record;
-x(1,:) = x(1, :) - 1;
+x(1,:) = x(1, :)-0.2;
 y = GMR(x);
 
 hand_regress = y(9:11, :);
