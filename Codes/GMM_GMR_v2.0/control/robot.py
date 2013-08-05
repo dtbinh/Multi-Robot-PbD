@@ -16,8 +16,6 @@ class ROBOT():
 	
   def searchBall(self):
     self.motion.setStiffnesses("Head", 1.0)
-    self.mouthCam()
-    sleep(1)
     self.redballtracker.stopTracker()
     sleep(1)
     self.redballtracker.startTracker()

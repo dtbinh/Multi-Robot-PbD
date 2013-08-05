@@ -1,8 +1,8 @@
 import os, sys
 from naoqi import *
 #from compare import compare
-from action import move 
-from robot import *
+from action_hand import move 
+from robot import * 
 
 if __name__ == "__main__":
   ironhide = "10.26.210.60"
