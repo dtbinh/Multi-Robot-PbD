@@ -10,8 +10,6 @@ x(1,:) = x(1, :)-0.2;
 y = GMR(x);
 
 
-
-
 % hand path
 % max(ball_record')
 % min(ball_record')
