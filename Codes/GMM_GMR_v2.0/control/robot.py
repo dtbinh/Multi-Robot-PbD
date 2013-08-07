@@ -17,6 +17,7 @@ class ROBOT():
   def searchBall(self):
     self.motion.setStiffnesses("Head", 1.0)
     self.redballtracker.stopTracker()
+    self.mouthCam()
     sleep(1)
     self.redballtracker.startTracker()
     print self.redballtracker.getPosition()
@@ -28,6 +29,7 @@ class ROBOT():
     speed = 0.1
     while True:
       self.mouthCam()
+      sleep(1)
       if not self.redballtracker.isActive():
         self.speech.say('Can not start tracking')
         self.exit()
@@ -39,7 +41,7 @@ class ROBOT():
         self.speech.say("new ball, start tracking")
         break 
       
-      self.motion.setAngles("HeadPitch", 0.2, speed)
+      self.motion.setAngles("HeadPitch", 0.5, speed)
       sleep(2)
       if self.redballtracker.isNewData():
         self.speech.say("new ball, start tracking") 
@@ -93,13 +95,13 @@ class ROBOT():
     LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
     RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
     result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
-    return str(result) 
+    return result 
 
   def HandData(self):
     # 0-torso, 1-world, 2-robot
     space = 0
     useSensorValues = True
-    return str(self.motion.getPosition(self.side+"Arm", space, useSensorValues))
+    return self.motion.getPosition(self.side+"Arm", space, useSensorValues)
   
   def BallData(self):
     if not self.redballtracker.isActive():
@@ -109,21 +111,26 @@ class ROBOT():
     sumx = 0
     sumy = 0
     sumz = 0
-    for i in range(1, 101):
+    counter = 100
+    while counter > 0:
       ballx, bally, ballz = self.redballtracker.getPosition()
-      sumx = sumx + ballx
-      sumy = sumy + bally
-      sumz = sumz + ballz
+      if (ballx < 1 and bally < 1 and ballz < 1):
+        sumx = sumx + ballx
+        sumy = sumy + bally
+        sumz = sumz + ballz
+        #print "legal ball position:", ballx, bally, ballz
+        counter = counter - 1
+      else:
+        print "illegal ball position, abandon"
     sumx = sumx / 100
     sumy = sumy / 100
     sumz = sumz / 100
     
-    return str([sumx, sumy, sumz]) 
+    return [sumx, sumy, sumz] 
   
   def mouthCam(self):
     while self.camera.getParam(18) == 0:
       self.camera.setParam(18, 1)
-    return None
 
   def exit(self):
     try:
