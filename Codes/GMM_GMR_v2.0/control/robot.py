@@ -94,15 +94,20 @@ class ROBOT():
     # LHipYawPitch and RHipYawPitch share the same motor
     LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
     RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
-    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
+    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
+    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
     return result 
 
   def HandData(self):
     # 0-torso, 1-world, 2-robot
     space = 0
     useSensorValues = True
-    return self.motion.getPosition(self.side+"Arm", space, useSensorValues)
-  
+    # 6 DOF: 3 position and 3 orientation
+    #return self.motion.getPosition(self.side+"Arm", space, useSensorValues)
+    # 3 DOF
+    data = self.motion.getPosition(self.side+"Arm", space, useSensorValues)
+    return data[0:3]
+
   def BallData(self):
     if not self.redballtracker.isActive():
       print "Tracker is not active."
@@ -111,7 +116,8 @@ class ROBOT():
     sumx = 0
     sumy = 0
     sumz = 0
-    counter = 100
+    counter = 200.0
+    c = counter
     while counter > 0:
       ballx, bally, ballz = self.redballtracker.getPosition()
       if (ballx < 1 and bally < 1 and ballz < 1):
@@ -122,12 +128,29 @@ class ROBOT():
         counter = counter - 1
       else:
         print "illegal ball position, abandon"
-    sumx = sumx / 100
-    sumy = sumy / 100
-    sumz = sumz / 100
+    sumx = sumx / c 
+    sumy = sumy / c 
+    sumz = sumz / c
     
     return [sumx, sumy, sumz] 
   
+  def fixLegs(self):
+    self.motion.setStiffnesses("Body", 0.0)
+    RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
+    LLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
+    timeLists = 1.0
+    isAbsolute = True
+    
+    self.motion.setStiffnesses("RLeg", 1.0)
+    self.motion.angleInterpolation("RLeg", RLeg, timeLists, isAbsolute)
+    self.motion.setStiffnesses("LLeg", 1.0)
+    self.motion.angleInterpolation("LLeg", LLeg, timeLists, isAbsolute)
+    
+    #self.motion.setStiffnesses("RHipPitch", 0.0)
+    #self.motion.setStiffnesses("LHipPitch", 0.0)
+    sleep(2)
+    print "Leg stiffnesses set."
+
   def mouthCam(self):
     while self.camera.getParam(18) == 0:
       self.camera.setParam(18, 1)
@@ -167,4 +190,3 @@ def takePicture(robot, imgName):
     im.save("../data/wiping/img/"+imgName+".png", "PNG")
     im.show()
     print ">>> Finish taking picture"
-

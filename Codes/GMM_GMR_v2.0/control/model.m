@@ -44,7 +44,7 @@ function [Priors, Mu, Sigma] = model(filename)
 
 %% Definition of the number of components used in GMM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nbStates = 10;
+nbStates = 4;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,7 +52,25 @@ nbStates = 10;
 % load('data/data2_b.mat'); %load 'queryData'
 load(filename);
 tmp = raw_all';
-Data=tmp;
+
+%use ball position as queries
+%Data=tmp;
+
+%use distance between ball and hand, and hand orientation as queries
+tmp(4, :) = tmp(4, :) - tmp(1, :);
+tmp(5, :) = tmp(5, :) - tmp(2, :);
+tmp(6, :) = tmp(6, :) - tmp(3, :);
+
+for i = 4 : 6
+ plot(abs(tmp(i,:)));
+ hold on;
+end
+
+Data =  tmp(1:12, :);
+save('Data.mat', 'Data');
+disp('size of Data:  ');
+size(Data)
+
 nbVar = size(Data,1);
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.

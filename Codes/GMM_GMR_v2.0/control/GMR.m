@@ -59,8 +59,14 @@ load('data/Priors.mat');
 
 %load('data/raw_1.mat');
 
-in = [1:3];
-out = [4:17];
+%use ball position as queries
+% in = [1:3];
+% out = [4:17];
+
+%use distance between ball and hand, and hand orientation as queries
+
+in = [1:6];
+out = [7:12];
 
 
 nbData = length(x(1,:)); %nbData is the number of input data point
