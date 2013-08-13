@@ -67,7 +67,7 @@ for i = 4 : 6
 end
 
 Data =  tmp(1:12, :);
-save('Data.mat', 'Data');
+save('data/Data.mat', 'Data');
 disp('size of Data:  ');
 size(Data)
 

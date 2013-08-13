@@ -2,6 +2,7 @@ import sys, os
 from time import *
 from naoqi import *
 from time import *
+from math_func import *
 
 class ROBOT():
   def __init__(self, ip, port, side):
@@ -16,9 +17,9 @@ class ROBOT():
 	
   def searchBall(self):
     self.motion.setStiffnesses("Head", 1.0)
-    self.redballtracker.stopTracker()
     self.mouthCam()
     sleep(1)
+    #self.redballtracker.stopTracker()
     self.redballtracker.startTracker()
     print self.redballtracker.getPosition()
     if not self.redballtracker.isActive():
@@ -53,7 +54,7 @@ class ROBOT():
         self.speech.say("new ball, start tracking") 
         break 
       
-      self.motion.setAngles("HeadPitch", -0.2, speed)
+      self.motion.setAngles("HeadPitch", -0.1, speed)
       sleep(2)
       if self.redballtracker.isNewData():
         self.speech.say("new ball, start tracking") 
@@ -113,27 +114,23 @@ class ROBOT():
       print "Tracker is not active."
       self.speech.say('Fail tracking')
       self.exit()
-    sumx = 0
-    sumy = 0
-    sumz = 0
-    counter = 200.0
-    c = counter
+    
+    ball =[]
+    counter = 200
     while counter > 0:
-      ballx, bally, ballz = self.redballtracker.getPosition()
-      if (ballx < 1 and bally < 1 and ballz < 1):
-        sumx = sumx + ballx
-        sumy = sumy + bally
-        sumz = sumz + ballz
-        #print "legal ball position:", ballx, bally, ballz
+      tmp = self.redballtracker.getPosition()
+      if all(item < 1 for item in tmp):
+        #print tmp
+        ball.append(tmp)
         counter = counter - 1
       else:
-        print "illegal ball position, abandon"
-    sumx = sumx / c 
-    sumy = sumy / c 
-    sumz = sumz / c
-    
-    return [sumx, sumy, sumz] 
-  
+        print tmp, "illegal ball position, abandon"
+    ballPos = removeAbn(ball)
+    #print "pure position: "
+    #print "\n\n"
+    return ballPos 
+
+ 
   def fixLegs(self):
     self.motion.setStiffnesses("Body", 0.0)
     RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]

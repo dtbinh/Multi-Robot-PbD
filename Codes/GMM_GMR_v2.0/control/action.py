@@ -9,20 +9,7 @@ def moveJoints(robot):
   robot.searchBall()
   
   #get ball position
-  sleep(3)
-  s = [0, 0, 0]
-  counter = 500
-  while counter > 0:  
-    x, y, z = robot.redballtracker.getPosition() 
-    if x < 1.5 and y < 1.5 and z < 1.5:
-      tmpPos = [x, y, z]
-      print tmpPos
-      s = [a+b for a, b in zip(s, tmpPos)]
-      counter = counter - 1
-    else:
-      print "illegal ball position"
-  ballPos = [item/500 for item in s]
-
+  #ballPos = robot.BallData()
   # main loop
   step = 1 
   while (step < 30):
@@ -34,21 +21,7 @@ def moveJoints(robot):
       print "Tracker failed, try again"
       robot.speech.say("Tracker failed, try again.")
      
-    #get ball position
-    s = [0, 0, 0]
-    counter = 100
-    while counter > 0:  
-      x, y, z = robot.redballtracker.getPosition() 
-      if x < 1.5 and y < 1.5 and z < 1.5:
-        tmpPos = [x, y, z]
-        #print tmpPos
-        s = [a+b for a, b in zip(s, tmpPos)]
-        counter = counter - 1
-      else:
-        print "illegal ball position"
-    ballPos = [item/100 for item in s]
-    
-    #ballPos = [0.38735684275627136, -0.0041554826651699845, 0.2161797085404396]
+    ballPos = robot.BallData()  
     handPos = robot.HandData()
     #print "hand position: ", handPos
     for i in range(0, len(ballPos)):
@@ -64,8 +37,8 @@ def moveJoints(robot):
     if all(item == 0 for item in joints):
       print "illegal joints, abandom"
     else:
-      robot.speech.say("move")
-      sleep(1)
+      #robot.speech.say("move")
+      #sleep(1)
       maxSpeedFraction  = 0.1
       #names  = ["RArm", "LHipPitch", "RHipPitch"]
       names  = ["RArm"]
