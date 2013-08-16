@@ -1,5 +1,5 @@
 from robot import *
-
+'''
 def record_unstableBall(argv):
   if argv[0] == "ironhide":
     ip = "10.26.210.60"
@@ -27,7 +27,7 @@ def record_unstableBall(argv):
     
   robot.exit()
   print "<<< Exit recording normally."
-
+'''
 def record(argv):
   if argv[0] == "ironhide":
     ip = "10.26.210.60"
@@ -45,15 +45,10 @@ def record(argv):
 
   s = [0, 0, 0]
   counter = 500
-  while counter > 0:    
-    x, y, z = robot.redballtracker.getPosition()  
-    if x < 1.5 and y < 1.5 and z < 1.5:
-      tmpPos = [x, y, z]
-      s = [a+b for a, b in zip(s, tmpPos)]
-      counter = counter - 1
-    else:
-      print "illegal ball position"
-  ballPos = [item/500 for item in s]
+  ballPos = robot.BallData()
+  sleep(1) 
+  robot.motion.setStiffnesses("RHipPitch", 0.0)
+  robot.motion.setStiffnesses("LHipPitch", 0.0)
 
   while not (robot.headTouch()):
     if not robot.redballtracker.isActive():

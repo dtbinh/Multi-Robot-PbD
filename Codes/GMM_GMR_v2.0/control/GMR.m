@@ -1,4 +1,4 @@
-function y = GMR(x)
+function y = GMR(x, in, out)
 %
 % Gaussian Mixture Regression.
 % This source code is the implementation of the algorithms described in 
@@ -65,9 +65,8 @@ load('data/Priors.mat');
 
 %use distance between ball and hand, and hand orientation as queries
 
-in = [1:6];
-out = [7:12];
-
+%in = [1:6];
+%out = [7:14];
 
 nbData = length(x(1,:)); %nbData is the number of input data point
 nbVar = size(Mu,1);

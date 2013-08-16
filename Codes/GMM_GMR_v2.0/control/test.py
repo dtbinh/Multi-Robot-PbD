@@ -17,6 +17,7 @@ def test_moveJoints_action(action_name, robot):
     robot.motion.angleInterpolationWithSpeed(names, joints, speed)
     i = i + 1
     robot.headTouch()
+
 def test_moveJoints(robot):
   robot.speech.say("test move right arm joints")
   robot.motion.setStiffnesses("RArm", 1.0)
@@ -34,7 +35,6 @@ def test_closeHand(robot):
   robot.motion.angleInterpolation("RHand", handSta, timeLists, isAbsolute)
   sleep(3)
 
-
 def test_ballrange(robot):
    robot.searchBall()
    while not robot.headTouch():
@@ -43,6 +43,14 @@ def test_ballrange(robot):
      Data = robot.BallData() 
      print Data
 
+def test_jointangle(robot):
+   while not robot.headTouch():
+     print robot.JointData()
+
+def test_handpos(robot):
+   robot.motion.setStiffnesses('RArm', 1.0)
+   while not robot.headTouch():
+     print robot.HandData()
 #find the difference between the command and sensed angles.
 #JointData() in robot.py uses sensor readings
 def test_getAngles(robot):

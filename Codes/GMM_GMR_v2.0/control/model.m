@@ -1,13 +1,10 @@
-function [Priors, Mu, Sigma] = model(filename)
+function [Priors, Mu, Sigma] = model(Data, nbStates, numDemo)
 %
 % Demo of the spatial Gaussian Mixture Regression (GMR) using query points 
 % of arbitrary dimensions. 
 % This source code is the implementation of the algorithms described in 
 % Section 2.4, p.38 of the book "Robot Programming by Demonstration: A 
 % Probabilistic Approach". 
-%
-% Author:	Sylvain Calinon, 2009
-%			http://programming-by-demonstration.org
 %
 % This program loads a 4D dataset, trains a 
 % Gaussian Mixture Model (GMM), and uses query points of 2 dimensions to 
@@ -20,57 +17,11 @@ function [Priors, Mu, Sigma] = model(filename)
 % spatial distributiuon for the remaining dimensions (i.e. data for right 
 % hand), through Gaussian Mixture Regression (GMR).
 %
-% This source code is given for free! However, I would be grateful if you refer 
-% to the book (or corresponding article) in any academic publication that uses 
-% this code or part of it. Here are the corresponding BibTex references: 
-%
-% @book{Calinon09book,
-%   author="S. Calinon",
-%   title="Robot Programming by Demonstration: A Probabilistic Approach",
-%   publisher="EPFL/CRC Press",
-%   year="2009",
-%   note="EPFL Press ISBN 978-2-940222-31-5, CRC Press ISBN 978-1-4398-0867-2"
-% }
-%
-% @article{Calinon07,
-%   title="On Learning, Representing and Generalizing a Task in a Humanoid Robot",
-%   author="S. Calinon and F. Guenter and A. Billard",
-%   journal="IEEE Transactions on Systems, Man and Cybernetics, Part B",
-%   year="2007",
-%   volume="37",
-%   number="2",
-%   pages="286--298",
-% }
-
-%% Definition of the number of components used in GMM.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nbStates = 4;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load('data/data2_a.mat'); %load 'Data'
-% load('data/data2_b.mat'); %load 'queryData'
-load(filename);
-tmp = raw_all';
-
-%use ball position as queries
-%Data=tmp;
-
-%use distance between ball and hand, and hand orientation as queries
-tmp(4, :) = tmp(4, :) - tmp(1, :);
-tmp(5, :) = tmp(5, :) - tmp(2, :);
-tmp(6, :) = tmp(6, :) - tmp(3, :);
-
-for i = 4 : 6
- plot(abs(tmp(i,:)));
- hold on;
-end
-
-Data =  tmp(1:12, :);
-save('data/Data.mat', 'Data');
-disp('size of Data:  ');
-size(Data)
-
+[Dim, numPoints] = size(Data);
 nbVar = size(Data,1);
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
@@ -99,14 +50,24 @@ nbVar = size(Data,1);
 % 
 % %% Plot of the GMM encoding results
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% subplot(3,1,2); hold on;
+%  subplot(3,1,2); hold on;
 % plotGMM(Mu([1,2],:), Sigma([1,2],[1,2],:), [.8 0 0], 1);
 % plotGMM(Mu([3,4],:), Sigma([3,4],[3,4],:), [0 .8 0], 1);
 % axis([min([Data(1,:),Data(3,:)])-0.02 max([Data(1,:),Data(3,:)])+0.02 ...
 %   min([Data(2,:),Data(4,:)])-0.01 max([Data(2,:),Data(4,:)])+0.01]);
 % xlabel('x_1,x_3','fontsize',16); ylabel('x_2,x_4','fontsize',16);
-% 
-% %% Plot of the GMR regression results
+
+%Chi
+%  Mu
+% subplot(3,1,2);
+
+
+%plotGMM(Mu([3,4],:), Sigma([3,4],[3,4],:), [0 .8 0], 1);
+% axis([min(Data(input_x,:))-0.2, max(Data(input_x,:))+0.2...
+%  min(Data(input_y,:))-0.01 max(Data(input_y,:))+0.1]);
+
+
+%% Plot of the GMR regression results
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subplot(3,1,3); hold on;
 % plotGMM(expData([3,4],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);

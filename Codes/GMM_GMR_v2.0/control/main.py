@@ -11,13 +11,15 @@ if __name__ == "__main__":
   #robot.searchBall()
   #robot.fixLegs()
   #moveHand(robot) 
-  #moveJoints(robot) 
+  moveJoints(robot) 
   
-  # test snippets
+  # test scripts
   #test_moveJoints(robot)
   #test_closeHand(robot)
-  test_ballrange(robot)
-  #test_angles(robot)
+  #test_ballrange(robot)
+  #test_handpos(robot)
+  
+
   robot.exit()
   #diff = compare()
   #print "compared difference: ", diff

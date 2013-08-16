@@ -1,0 +1,25 @@
+%Main function
+
+function calModel()
+    clc;
+    clear;
+    
+    path = 'data/';
+    numDemo = 3;
+    numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+  
+ 
+ %   delete('data/*.mat');
+ %   flagDTW = 0;
+ %   readAll(path, numDemo, numDim, flagDTW);
+    load('data/raw_all.mat');
+    numStates = 3;
+    tmp = raw_all';
+    Data =  tmp;
+    disp('size of Data:  ');
+    
+    [Priors, Mu, Sigma] = model('data/raw_all.mat', numStates, numDemo);
+    save('data/Priors.mat', 'Priors');
+    save('data/Mu.mat', 'Mu');
+    save('data/Sigma.mat', 'Sigma');
+end         

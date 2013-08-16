@@ -2,7 +2,7 @@ import sys, os
 from time import *
 from naoqi import *
 from time import *
-from math_func import *
+from mlabwrap import mlab
 
 class ROBOT():
   def __init__(self, ip, port, side):
@@ -61,7 +61,6 @@ class ROBOT():
         break 
       if self.headTouch():
 	break
-   
 
   def pickBall(self):
     headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value') 
@@ -95,13 +94,13 @@ class ROBOT():
     # LHipYawPitch and RHipYawPitch share the same motor
     LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
     RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
-    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
-    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
+    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
+    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
     return result 
 
   def HandData(self):
     # 0-torso, 1-world, 2-robot
-    space = 0
+    space = 2 
     useSensorValues = True
     # 6 DOF: 3 position and 3 orientation
     #return self.motion.getPosition(self.side+"Arm", space, useSensorValues)
@@ -116,7 +115,7 @@ class ROBOT():
       self.exit()
     
     ball =[]
-    counter = 200
+    counter = 100
     while counter > 0:
       tmp = self.redballtracker.getPosition()
       if all(item < 1 for item in tmp):
@@ -125,9 +124,10 @@ class ROBOT():
         counter = counter - 1
       else:
         print tmp, "illegal ball position, abandon"
-    ballPos = removeAbn(ball)
-    #print "pure position: "
-    #print "\n\n"
+    ballPos = mlab.removeAbnormal(ball)
+    ballPos = ballPos[0]
+    ballPos = ballPos.tolist()
+    #print "robot.py ballPos: ", ballPos, "type", type(ballPos)
     return ballPos 
 
  
@@ -135,14 +135,15 @@ class ROBOT():
     self.motion.setStiffnesses("Body", 0.0)
     RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
     LLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
-    timeLists = 1.0
+    timeLists = 2.0
     isAbsolute = True
     
     self.motion.setStiffnesses("RLeg", 1.0)
     self.motion.angleInterpolation("RLeg", RLeg, timeLists, isAbsolute)
     self.motion.setStiffnesses("LLeg", 1.0)
     self.motion.angleInterpolation("LLeg", LLeg, timeLists, isAbsolute)
-    
+   
+    #turn off torso stiffness
     #self.motion.setStiffnesses("RHipPitch", 0.0)
     #self.motion.setStiffnesses("LHipPitch", 0.0)
     sleep(2)

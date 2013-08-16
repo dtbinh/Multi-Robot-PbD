@@ -6,42 +6,47 @@ def moveJoints(robot):
   robot.motion.openHand("RHand")
   robot.fixLegs()
   robot.motion.setStiffnesses("Body", 1.0)
-  robot.searchBall()
+  #robot.searchBall()
   
-  #get ball position
-  #ballPos = robot.BallData()
   # main loop
+  #ballPos = robot.BallData() 
+  ballPos = [0.26, 0, 0.18]
   step = 1 
-  while (step < 30):
+  while (step < 280):
     print "step:  ", step
     robot.mouthCam() 
+
+    '''
     #check if traker works
     while not robot.redballtracker.isActive():
       robot.redballtracker.startTracker()
       print "Tracker failed, try again"
       robot.speech.say("Tracker failed, try again.")
-     
-    ballPos = robot.BallData()  
+    '''
+    #ballPos = robot.BallData() 
+    #ballPos = robot.redballtracker.getPosition() 
     handPos = robot.HandData()
-    #print "hand position: ", handPos
-    for i in range(0, len(ballPos)):
-      handPos[i] = handPos[i] - ballPos[i]
+      
+    for index, item in enumerate(ballPos):
+      handPos[index] = handPos[index] - item
+
+    inDim = range(1, 7)
+    outDim = range(7,15)
     query = ballPos + handPos
-    print "query: ", query 
+    print "query: ", query
     
-    output = mlab.GMR(query)
+    output = mlab.GMR(query, inDim, outDim)
     joints = []
-    for index, item in enumerate(output[0:6]):
+    for index, item in enumerate(output[0:8]):
       joints.append(float(item))
     print "joints: ", joints, "\n"
     if all(item == 0 for item in joints):
       print "illegal joints, abandom"
     else:
-      #robot.speech.say("move")
-      #sleep(1)
       maxSpeedFraction  = 0.1
-      #names  = ["RArm", "LHipPitch", "RHipPitch"]
-      names  = ["RArm"]
+      names  = ["RArm", "LHipPitch", "RHipPitch"]
+      #names  = ["RArm"]
+      robot.motion.setStiffnesses(names, 1.0)
       robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
       step = step + 1    
     if robot.headTouch():
