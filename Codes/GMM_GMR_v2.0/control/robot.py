@@ -57,7 +57,7 @@ class ROBOT():
       self.motion.setAngles("HeadPitch", -0.1, speed)
       sleep(2)
       if self.redballtracker.isNewData():
-        self.speech.say("new ball, start tracking") 
+        self.speech.say("new ball") 
         break 
       if self.headTouch():
 	break
@@ -135,6 +135,7 @@ class ROBOT():
     self.motion.setStiffnesses("Body", 0.0)
     RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
     LLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
+    #timeLists = [1, 2, 3, 4, 5, 6]
     timeLists = 2.0
     isAbsolute = True
     
@@ -148,6 +149,7 @@ class ROBOT():
     #self.motion.setStiffnesses("LHipPitch", 0.0)
     sleep(2)
     print "Leg stiffnesses set."
+    self.speech.say("set legs")
 
   def mouthCam(self):
     while self.camera.getParam(18) == 0:

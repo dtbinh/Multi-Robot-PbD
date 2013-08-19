@@ -10,7 +10,7 @@ def moveJoints(robot):
   
   # main loop
   #ballPos = robot.BallData() 
-  ballPos = [0.26, 0, 0.18]
+  ballPos = [0.26, -0.20, 0.21]
   step = 1 
   while (step < 280):
     print "step:  ", step
@@ -47,7 +47,7 @@ def moveJoints(robot):
       names  = ["RArm", "LHipPitch", "RHipPitch"]
       #names  = ["RArm"]
       robot.motion.setStiffnesses(names, 1.0)
-      robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+      #robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
       step = step + 1    
     if robot.headTouch():
       break
