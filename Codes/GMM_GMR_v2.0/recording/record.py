@@ -12,12 +12,55 @@ class ROBOT():
     self.camera = ALProxy('ALVideoDevice', self.ip, self.port)
     self.redballtracker = ALProxy('ALRedBallTracker', self.ip, self.port)
     self.speech = ALProxy('ALTextToSpeech', self.ip, self.port)
+	
+  def searchBall(self):
+    self.mouthCam()
+    sleep(1)
+    self.motion.setStiffnesses("Head", 1.0)
+    self.redballtracker.startTracker()
 
-  def headTouch(self):
-    headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value')
-    headMiddle = self.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
+    if not self.redballtracker.isActive():
+      self.speech.say('Can not start tracking')
+      self.exit()
+    #[ballx, bally, ballz] = self.redballtracker.getPosition()
+    angle = 0.4
+    speed = 0.1
+    while(1):
+      self.mouthCam()
+      self.speech.say("Search ball")
+      self.motion.setAngles("HeadYaw", angle, speed)
+      if self.redballtracker.isNewData():
+        break
+      sleep(2)
+      self.motion.setAngles("HeadPitch", angle, speed)
+      if self.redballtracker.isNewData():
+        break
+      sleep(2)
+      self.motion.setAngles("HeadYaw", -angle, speed)
+      if self.redballtracker.isNewData():
+        break
+      sleep(2)
+      self.motion.setAngles("HeadPitch", -angle, speed)
+      if self.redballtracker.isNewData():
+        break
+      sleep(2)
+    self.speech.say("Find ball, start tracking") 
+
+  def pickBall(self):
+    headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value') 
+    if headFront:
+      self.motion.closeHand(self.side+"Hand") 
+      self.motion.setStiffnesses("RHand", 1.0)
+      self.speech.say("Pick ball") 
+  def dropBall(self):
     headRear = self.memory.getData('Device/SubDeviceList/Head/Touch/Rear/Sensor/Value')
-    return headFront or headMiddle or headRear
+    if headRear:
+      self.motion.openHand(self.side+"Hand") 
+      self.motion.setStiffnesses("RHand", 1.0)
+      self.speech.say("Drop ball")
+  def headTouch(self):
+    headMiddle = self.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
+    return headMiddle
 
   def JointData(self):
     ShoulderPitch = self.memory.getData('Device/SubDeviceList/'+self.side+'ShoulderPitch/Position/Sensor/Value')
@@ -30,7 +73,7 @@ class ROBOT():
     LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
     RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
     result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
-    return str(result) + " "
+    return str(result) 
 
   def HandData(self):
     # 0-torso, 1-world, 2-robot
@@ -63,52 +106,35 @@ class ROBOT():
     
     self.speech.say('Exit normaly')
 
-############## main #################
-if __name__=='__main__':
+def main(argv):
+  if argv[0] == "ironhide":
+    ip = "10.26.210.60"
+  if argv[0] == "bumblebee":
+    ip = "10.26.210.59"
+  action_name = argv[1]
+  
+  robot = ROBOT(ip, 9559, 'R')
 
-  ironhide = ROBOT('10.26.210.60', 9559, 'R')
-  bumblebee = ROBOT('10.26.210.59', 9559, 'L')
-
-  ironhide.motion.setStiffnesses("Head", 1.0)
-  ironhide.motion.closeHand(ironhide.side+'Hand')
-  ironhide.motion.setStiffnesses(ironhide.side+"Hand", 1.0)
-  ironhide.redballtracker.startTracker()
-
-  if not ironhide.redballtracker.isActive():
-    ironhide.speech.say('Can not start tracking')
-    ironhide.exit()
-  else:
-    ironhide.speech.say('Start tracking')
-
-
-  bumblebee.motion.setStiffnesses("Head", 1.0)
-  bumblebee.motion.closeHand(bumblebee.side+'Hand')
-  bumblebee.motion.setStiffnesses(bumblebee.side+"Hand", 1.0)
-  bumblebee.redballtracker.startTracker()
-  if not bumblebee.redballtracker.isActive():
-    bumblebee.speech.say('Can not start tracking')
-    bumblebee.exit()
-  else:
-    bumblebee.speech.say('Start tracking')
-
-  filename = '../data/rolling/record_data_' + str(time())
+  filename = "../data/" + action_name + "/record_data_" + str(time())
   f = open(filename, 'w+')
+  
+  robot.searchBall()
   count = 0
-  while not (ironhide.headTouch() or bumblebee.headTouch()):
-    if not ironhide.redballtracker.isActive():
-       ironhide.speech.say('Can not start tracking')
-    if not bumblebee.redballtracker.isActive():
-      bumblebee.speech.say('Can not start tracking')
-    
-   # ironhide.mouthCam()
-   # bumblebee.mouthCam()
-    Data = ironhide.JointData()+ironhide.HandData()+ironhide.BallData()+bumblebee.JointData()+bumblebee.HandData()+bumblebee.BallData()
+  while not (robot.headTouch()):
+    if not robot.redballtracker.isActive():
+       robot.speech.say('Can not start tracking')
+    Data = robot.BallData() + " " + robot.JointData() + " " + robot.HandData()
     Data = Data + '\n'
     count += 1
     f.write(Data)
+    robot.pickBall()
+    robot.dropBall()
     print count, Data
     
-  ironhide.exit()
-  bumblebee.exit()
-
+  robot.exit()
   print "<<< Exit recording normally."
+
+if __name__== '__main__':
+	print sys.argv
+	argv = sys.argv[1:]
+	main(argv)
