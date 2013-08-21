@@ -1,19 +1,12 @@
-function result = BIC()
-    load('data/raw_all.mat');
-    tmp = raw_all';
-    Data = tmp(4:6, :);
-    numDemo = 3;
+function result = BIC(Data, maxStates)
+
     [nbVar, nbData] = size(Data);
-   
-
-
     in = [1:nbVar];
-    max = 10;
-    L = zeros(1,max);
-    S = zeros(1,max);
-    panlty = zeros(1, max);
-    for nbStates = 1:max
-            [Priors, Mu, Sigma] = model(Data, nbStates, numDemo);
+    L = zeros(1,maxStates);
+    S = zeros(1,maxStates);
+    panlty = zeros(1, maxStates);
+    for nbStates = 1:maxStates
+            [Priors, Mu, Sigma] = model(Data, nbStates);
         for j = 1 : nbData
             Pj = 0;
             for i=1:nbStates
@@ -33,6 +26,5 @@ function result = BIC()
   A = S;
   result = find(A==((min(A))));
   
-  pause;
-  close all;
+
 end

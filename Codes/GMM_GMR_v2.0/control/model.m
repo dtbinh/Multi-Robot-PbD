@@ -1,4 +1,4 @@
-function [Priors, Mu, Sigma] = model(Data, nbStates, numDemo)
+function [Priors, Mu, Sigma] = model(Data, nbStates)
 %
 % Demo of the spatial Gaussian Mixture Regression (GMR) using query points 
 % of arbitrary dimensions. 
