@@ -1,6 +1,6 @@
 %Main function
 
-function main()
+function main(queryData)
     clc;
     clear;
     
@@ -11,12 +11,18 @@ function main()
     
     % read(path, numDemo, numDim);  
     [Priors, Mu, Sigma] = demo2();
-    dlmwrite([path,'Priors.txt'], Priors, 'delimiter', '\t');
-    dlmwrite([path, 'Mu.txt'], Mu, 'delimiter', '\t');
-    for i = 1:size(Sigma, 3)
-        dlmwrite([path, 'Sigma.txt'], Sigma(:,:,1), '-append');
-    end
+    save('Priors.mat', 'Priors');
+    save('Mu.mat', 'Mu');
+    save('Sigma.mat', 'Sigma');
+%     dlmwrite([path,'Priors.txt'], Priors, 'delimiter', '\t');
+%     dlmwrite([path, 'Mu.txt'], Mu, 'delimiter', '\t');
+%     for i = 1:size(Sigma, 3)
+%         dlmwrite([path, 'Sigma.txt'], Sigma(:,:,1), '-append');
+%     end
     
+  %  [y] = GMR_test(Priors, Mu, Sigma, queryData, [1:3], [4:17]);
+
+   
 %     load('raw_1.mat');
 %     tmp = raw_1';
 %     queryData =[tmp(1:3, :)];

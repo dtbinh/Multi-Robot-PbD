@@ -44,8 +44,8 @@ nbStates = 4;
 
 %% Load a dataset consisting of 3 demonstrations of a 2D signal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load('../data/aligned_drawA.mat'); %load 'Data'
-nbVar = size(Data,1);
+load('data/data1.mat'); %load 'Data'
+nbVar = size(Data,1) 
 
 %% Training of GMM by EM algorithm, initialized by k-means clustering.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,11 +69,11 @@ for n=1:nbVar-1
   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
 end
-%plot 2D
-subplot(3*(nbVar-1),2,[2:2:2*(nbVar-1)]); hold on;
-plot(Data(2,:), Data(3,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
-axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
-xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
+% %plot 2D
+% subplot(3*(nbVar-1),2,[2:2:2*(nbVar-1)]); hold on;
+% plot(Data(2,:), Data(3,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
+% axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
+% xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 
 %% Plot of the GMM encoding results
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,11 +84,11 @@ for n=1:nbVar-1
   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
 end
-%plot 2D
-subplot(3*(nbVar-1),2,4+[2:2:2*(nbVar-1)]); hold on;
-plotGMM(Mu([2,3],:), Sigma([2,3],[2,3],:), [0 .8 0], 1);
-axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
-xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
+% %plot 2D
+% subplot(3*(nbVar-1),2,4+[2:2:2*(nbVar-1)]); hold on;
+% plotGMM(Mu([2,3],:), Sigma([2,3],[2,3],:), [0 .8 0], 1);
+% axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
+% xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 
 %% Plot of the GMR regression results
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,11 +99,12 @@ for n=1:nbVar-1
   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
 end
-%plot 2D
-subplot(3*(nbVar-1),2,8+[2:2:2*(nbVar-1)]); hold on;
-plotGMM(expData([2,3],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
-axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
-xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
+expData
+% %plot 2D
+% subplot(3*(nbVar-1),2,8+[2:2:2*(nbVar-1)]); hold on;
+% plotGMM(expData([2,3],:), expSigma([1,2],[1,2],:), [0 0 .8], 2);
+% axis([min(Data(2,:))-0.01 max(Data(2,:))+0.01 min(Data(3,:))-0.01 max(Data(3,:))+0.01]);
+% xlabel('x_1','fontsize',16); ylabel('x_2','fontsize',16);
 
 save('../data/reproduced_drawA', 'expData')
 pause;
