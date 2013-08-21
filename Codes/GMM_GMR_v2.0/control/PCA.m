@@ -44,13 +44,13 @@ function [Priors2, Mu, Sigma] = PCA(Data, nbStates, nbPC)
 %% Definition of the number of components used in GMM and the number of 
 %% principal components.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%nbStates = 3;
-%nbPC = 2;
+% nbStates = 3;
+% nbPC = 2;
 
 %% Load a dataset consisting of 3 demonstrations of a 4D signal 
 %% (3D spatial components + 1D temporal component).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%load('data/data.mat');
+% load('data/data.mat');
 [nbVar,nbData] = size(Data);
 
 %% Projection of the data in a latent space using PCA.
@@ -60,10 +60,7 @@ Data_mean = repmat(mean(Data(2:end,:),2), 1, nbData);
 centeredData = Data(2:end,:) - Data_mean;
 %Extract the eigencomponents of the covariance matrix 
 [E,v] = eig(cov(centeredData'));
-E
-v
 E = fliplr(E);
-E
 %Compute the transformation matrix by keeping the first nbPC eigenvectors
 A = E(:,1:nbPC);
 %Project the data in the latent space
@@ -90,7 +87,7 @@ for i=1:nbStates
   %Add a tiny variance to avoid numerical instability
   Sigma(:,:,i) = Sigma(:,:,i) + 1E-10.*diag(ones(nbVar,1));
 end
-
+Sigma
 %% Plot of the GMM encoding results.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('position',[50,50,1000,400]);
@@ -110,6 +107,6 @@ for n=1:nbVar2-1
   axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
 end
-%print('-depsc2','data/GMM-latentSpace-graph01.eps');
+print('-depsc2','data/GMM-latentSpace-graph01.eps');
 
 
