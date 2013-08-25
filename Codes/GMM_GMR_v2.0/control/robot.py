@@ -19,7 +19,7 @@ class ROBOT():
     self.motion.setStiffnesses("Head", 1.0)
     self.mouthCam()
     sleep(1)
-    #self.redballtracker.stopTracker()
+    self.redballtracker.stopTracker()
     self.redballtracker.startTracker()
     print self.redballtracker.getPosition()
     if not self.redballtracker.isActive():
@@ -67,14 +67,14 @@ class ROBOT():
     if headFront:
       self.motion.closeHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
-      self.speech.say("Pick ball") 
+      self.speech.say("Pick object") 
 
   def dropBall(self):
     headRear = self.memory.getData('Device/SubDeviceList/Head/Touch/Rear/Sensor/Value')
     if headRear:
       self.motion.openHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
-      self.speech.say("Drop ball")
+      self.speech.say("Drop object")
   
   def headTouch(self):
     headMiddle = self.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
@@ -106,7 +106,9 @@ class ROBOT():
     #return self.motion.getPosition(self.side+"Arm", space, useSensorValues)
     # 3 DOF
     data = self.motion.getPosition(self.side+"Arm", space, useSensorValues)
-    return data[0:3]
+    #action without object, like writing, waving...
+    #return data[0:3]
+    return data
 
   def BallData(self):
     if not self.redballtracker.isActive():

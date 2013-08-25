@@ -1,20 +1,24 @@
 from robot import *
 from mlabwrap import mlab
  
-def moveJoints(robot):
+def moveJoints(robot, action_name):
   #set stiffness
   robot.motion.openHand("RHand")
   robot.fixLegs()
   robot.motion.setStiffnesses("Body", 1.0)
-  #robot.searchBall()
   
-  # main loop
-  #ballPos = robot.BallData() 
+  OBJECT = False
+  if action_name == "picking":
+    OBJECT = True 
+  if OBJECT:
+    robot.searchBall()
+    ballPos = robot.BallData() 
+  
   ballPos = [0.26, -0.20, 0.21]
   step = 1 
-  while (step < 280):
+  while (step < 119):
     print "step:  ", step
-    robot.mouthCam() 
+    #robot.mouthCam() 
 
     '''
     #check if traker works
@@ -28,16 +32,21 @@ def moveJoints(robot):
     handPos = robot.HandData()
       
     for index, item in enumerate(ballPos):
-      handPos[index] = handPos[index] - item
+      ballPos[index] = handPos[index] - item
 
-    inDim = range(1, 7)
-    outDim = range(7,15)
-    query = ballPos + handPos
+    #inDim = range(1, 7)
+    #outDim = range(7,15)
+    inDim = range(1, 2)
+    outDim = range(2, 10)
+    if OBJECT:
+      query = ballPos + handPos
+    else:
+      query = step 
     print "query: ", query
     
     output = mlab.GMR(query, inDim, outDim)
     joints = []
-    for index, item in enumerate(output[0:8]):
+    for index, item in enumerate(output):
       joints.append(float(item))
     print "joints: ", joints, "\n"
     if all(item == 0 for item in joints):
@@ -47,7 +56,7 @@ def moveJoints(robot):
       names  = ["RArm", "LHipPitch", "RHipPitch"]
       #names  = ["RArm"]
       robot.motion.setStiffnesses(names, 1.0)
-      #robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
+      robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
       step = step + 1    
     if robot.headTouch():
       break

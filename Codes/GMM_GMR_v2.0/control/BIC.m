@@ -6,6 +6,7 @@ function result = BIC(Data, maxStates)
     S = zeros(1,maxStates);
     panlty = zeros(1, maxStates);
     for nbStates = 1:maxStates
+            fprintf('test nbStates %d\n', nbStates);
             [Priors, Mu, Sigma] = model(Data, nbStates);
         for j = 1 : nbData
             Pj = 0;
@@ -20,7 +21,7 @@ function result = BIC(Data, maxStates)
     end
 
   hold on;
-  plot(L, 'g');
+  plot(-L, 'g');
   plot(panlty, 'r');
   plot(S, 'b');
   A = S;

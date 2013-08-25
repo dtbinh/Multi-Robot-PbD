@@ -1,28 +1,33 @@
-function [Priors2, Mu, Sigma] = trainModelwithPCA(Data, threshold)
-
+function [Priors2, Mu, Sigma] = trainModelwithPCA(Data, threshold, maxStates)
 
 [nbVar,nbData] = size(Data);
 
-%PCA: nbPCA and Data2
-nbPC = numPCA(Data, threshold);
-Data_mean = repmat(mean(Data,2), 1, nbData);
-centeredData = Data - Data_mean;
+%% nbPC   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+nbPC = numPCA(Data(2:end, :), threshold);
+
+%% PCA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Re-center the data
+Data_mean = repmat(mean(Data(2:end,:),2), 1, nbData);
+centeredData = Data(2:end,:) - Data_mean;
 %Extract the eigencomponents of the covariance matrix 
 [E,v] = eig(cov(centeredData'));
 E = fliplr(E);
 %Compute the transformation matrix by keeping the first nbPC eigenvectors
 A = E(:,1:nbPC);
 %Project the data in the latent space
-Data2(1:nbPC, :) = A' * centeredData;
+nbVar2 = nbPC+1;
+Data2(1,:) = Data(1,:);
+Data2(2:nbVar2,:) = A' * centeredData;
 
+%% BIC: nbStates
+nbStates = BIC(Data2(2:end, :), maxStates);
+fprintf('nbStates %d\n', nbStates);
 
-% BIC: nbStates
-    maxStates = 10;
-    nbStates = BIC(Data2, maxStates);
-    fprintf('nbStates %d\n', nbStates);
-
-
-
+%nbStates = 5;
+%% Training of GMM by EM algorithm, initialized by k-means clustering.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Priors0, Mu0, Sigma0] = EM_init_kmeans(Data2, nbStates);
 [Priors2, Mu2, Sigma2] = EM(Data2, Priors0, Mu0, Sigma0);
 
@@ -60,5 +65,3 @@ for n=1:nbVar2-1
   xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
 end
 %print('-depsc2','data/GMM-latentSpace-graph01.eps');
-
-

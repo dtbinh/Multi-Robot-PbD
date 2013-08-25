@@ -5,57 +5,46 @@ function calModel()
     clear;
     
     path = 'data/';
-    numDemo = 3;
+    numDemo = 5;
     numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
  
-%    delete('data/*.mat');
-%    flagDTW = 1;
-%    readAll(path, numDemo, numDim, flagDTW);
+%      delete('data/*.mat');
+%      flagDTW = 1;
+%      readAll(path, numDemo, numDim, flagDTW);
  
     load('data/raw_all.mat');
     tmp = raw_all';
     
-    % cal distance
-    tmp(1, :) = tmp(4, :) - tmp(1, :);
-    tmp(2, :) = tmp(5, :) - tmp(2, :);
-    tmp(3, :) = tmp(6, :) - tmp(3, :);
-
-    onetime = [1:size(tmp,2)/3];
-    timeDim = [onetime, onetime, onetime];
+%     % cal distance
+%     tmp(1, :) = tmp(4, :) - tmp(1, :);
+%     tmp(2, :) = tmp(5, :) - tmp(2, :);
+%     tmp(3, :) = tmp(6, :) - tmp(3, :);
+    
+    onetime = [1:size(tmp,2)/numDemo];
+    timeDim = repmat(onetime, [1, numDemo]);
     Data =[timeDim; tmp];
     
     [nbVar, nbData] = size(Data);
     fprintf('size of Data: [%d, %d]\n',nbVar, nbData);
 
-%     nbStates = BIC(Data, numDemo)
 
-  
-%     inputDist= Data(2:4, :);
-%     inputHand = Data(5:7, :);
-%     inputJoint = Data(8:end, :);
-%     inputAll = Data(2:end, :);
-%     
-    % threshold for PCA
+    % Training model with PCA and BIC
+    maxStates = 10
     threshold = 0.98;
+
+%   [Priors, Mu, Sigma] = trainModel([Data(1,:); Data(8:end,:)], maxStates);
+
+   [Priors, Mu, Sigma] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates);
+%   [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime(Data(2:end,:), threshold, maxStates);
   
-    %[Data2, A] = PCA(inputAll, threshold);
-    
-%     % BIC
-%     maxStates = 10;
-%     nbStates = BIC(Data2, maxStates);
-%     fprintf('nbStates %d\n', nbStates);
-    
-    %% Training of GMM by EM algorithm, initialized by k-means clustering.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [Priors, Mu, Sigma] = trainModelwithPCA([timeDim;Data], threshold);
     save('data/Priors.mat', 'Priors');
     save('data/Mu.mat', 'Mu');
     save('data/Sigma.mat', 'Sigma');
     
     %% Plotting    
-    nbVarDist = 3;
-    nbVarHand = 3;
-    nbVarJoints = 8;
+%    nbVarDist = 3;
+%    nbVarHand = 3;
+%    nbVarJoints = 8;
 %     
 %   
 %     
