@@ -8,17 +8,17 @@ def moveJoints(robot, action_name):
   robot.motion.setStiffnesses("Body", 1.0)
   
   OBJECT = False
+  #if action_name == "picking" or action_name == "wiping":
   if action_name == "picking":
     OBJECT = True 
   if OBJECT:
     robot.searchBall()
     ballPos = robot.BallData() 
   
-  ballPos = [0.26, -0.20, 0.21]
+  #ballPos = [0.26, -0.20, 0.21]
   step = 1 
-  while (step < 119):
+  while (step < 141):
     print "step:  ", step
-    #robot.mouthCam() 
 
     '''
     #check if traker works
@@ -29,25 +29,30 @@ def moveJoints(robot, action_name):
     '''
     #ballPos = robot.BallData() 
     #ballPos = robot.redballtracker.getPosition() 
-    handPos = robot.HandData()
-      
-    for index, item in enumerate(ballPos):
-      ballPos[index] = handPos[index] - item
-
-    #inDim = range(1, 7)
-    #outDim = range(7,15)
-    inDim = range(1, 2)
-    outDim = range(2, 10)
+    
     if OBJECT:
-      query = ballPos + handPos
+      #robot.mouthCam() 
+      handPos = robot.HandData()
+      dist = []   
+      for index, item in enumerate(ballPos):
+        dist.append(handPos[index] - item)
+      #query = ballPos + handPos
+      query = dist 
     else:
       query = step 
     print "query: ", query
+    
+    inDim = range(1, 2)
+    #outDim = range(2,10)
+    outDim = range(2,7)
     
     output = mlab.GMR(query, inDim, outDim)
     joints = []
     for index, item in enumerate(output):
       joints.append(float(item))
+    joints.append(1)
+    joints.append( -1.3)
+    joints.append( -1.3)
     print "joints: ", joints, "\n"
     if all(item == 0 for item in joints):
       print "illegal joints, abandom"

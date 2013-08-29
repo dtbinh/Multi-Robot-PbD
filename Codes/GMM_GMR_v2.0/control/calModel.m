@@ -6,37 +6,45 @@ function calModel()
     
     path = 'data/';
     numDemo = 5;
-    numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
- 
-%      delete('data/*.mat');
-%      flagDTW = 1;
-%      readAll(path, numDemo, numDim, flagDTW);
- 
+    numDim = 11;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+
+    
+
+%     delete('data/*.mat');
+%     flagDTW = 1;
+%     readAll(path, numDemo, numDim, flagDTW);
+%    
     load('data/raw_all.mat');
     tmp = raw_all';
     
-%     % cal distance
-%     tmp(1, :) = tmp(4, :) - tmp(1, :);
-%     tmp(2, :) = tmp(5, :) - tmp(2, :);
-%     tmp(3, :) = tmp(6, :) - tmp(3, :);
+%      % cal distance
+%      tmp(1, :) = tmp(4, :) - tmp(1, :);
+%      tmp(2, :) = tmp(5, :) - tmp(2, :);
+%      tmp(3, :) = tmp(6, :) - tmp(3, :);
     
+    % queried by time
     onetime = [1:size(tmp,2)/numDemo];
     timeDim = repmat(onetime, [1, numDemo]);
     Data =[timeDim; tmp];
     
+    % queried by ball-hand dist
     [nbVar, nbData] = size(Data);
     fprintf('size of Data: [%d, %d]\n',nbVar, nbData);
 
-
     % Training model with PCA and BIC
-    maxStates = 10
+    maxStates = 3;
     threshold = 0.98;
 
+    %queried by time
 %   [Priors, Mu, Sigma] = trainModel([Data(1,:); Data(8:end,:)], maxStates);
-
-   [Priors, Mu, Sigma] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates);
+    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates);
 %   [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime(Data(2:end,:), threshold, maxStates);
   
+    %queried by object   
+%     [Priors, Mu, Sigma] = trainModelwithPCA([Data(1:4,:); Data(11:end, :)], threshold, maxStates);
+%     [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime([Data(1:4, :); Data(11:end, :)], threshold, maxStates);
+
+
     save('data/Priors.mat', 'Priors');
     save('data/Mu.mat', 'Mu');
     save('data/Sigma.mat', 'Sigma');
@@ -98,7 +106,7 @@ function calModel()
 %     plot(Data(1,numPoints/numDemo * 3), Data(2, numPoints/numDemo * 3), 'go'); hold on;
 %     xlabel('x','fontsize',16); ylabel('y','fontsize',16);
     
-pause;
-close all;
+%pause;
+%close all;
 
 end        

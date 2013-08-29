@@ -1,4 +1,4 @@
-function [Priors2, Mu, Sigma] = trainModelwithPCA(Data, threshold, maxStates)
+function [Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA(Data, threshold, maxStates)
 
 [nbVar,nbData] = size(Data);
 
@@ -20,6 +20,9 @@ A = E(:,1:nbPC);
 nbVar2 = nbPC+1;
 Data2(1,:) = Data(1,:);
 Data2(2:nbVar2,:) = A' * centeredData;
+A'
+evalMx = abs(sum(A'))
+[v, evalIndex] = sort(evalMx)
 
 %% BIC: nbStates
 nbStates = BIC(Data2(2:end, :), maxStates);

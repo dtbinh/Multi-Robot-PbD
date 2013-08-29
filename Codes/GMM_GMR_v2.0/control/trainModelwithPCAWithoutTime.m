@@ -1,4 +1,4 @@
-function [Priors2, Mu, Sigma] = trainModelwithPCA(Data, threshold, maxStates)
+function [Priors2, Mu, Sigma] = trainModelwithPCAWithoutTime(Data, threshold, maxStates)
 
 [nbVar,nbData] = size(Data);
 
@@ -28,8 +28,8 @@ fprintf('nbStates %d\n', nbStates);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Priors0, Mu0, Sigma0] = EM_init_kmeans(Data2, nbStates);
 [Priors2, Mu2, Sigma2] = EM(Data2, Priors0, Mu0, Sigma0);
-size(Mu2)
-size(Sigma2)
+
+
 %% Re-project the GMM components in the original data space.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Project the centers of the Gaussian distributions, using only the spatial 
@@ -50,17 +50,17 @@ end
 % %plot 1D original data space
 % for n=1:nbVar-1
 %   subplot(nbVar-1,2,(n-1)*2+1); hold on;
-%   plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
+%   %plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
 %   plot(Data(1,:), Data(n+1,:), 'x', 'markerSize', 4, 'color', [.1 .1 .1]);
-%   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
+%  % axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
 %   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
 % end
 % %plot 1D latent space
 % for n=1:nbVar2-1
 %   subplot(nbVar-1,2,(n-1)*2+2); hold on;
-%   plotGMM(Mu2([1,n+1],:), Sigma2([1,n+1],[1,n+1],:), [.8 0 0], 1);
-%   plot(Data2(1,:), Data2(n+1,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
-%   axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
+%   %plotGMM(Mu2([1,n+1],:), Sigma2([1,n+1],[1,n+1],:), [.8 0 0], 1);
+%   plot(Data2(n,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
+%  % axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
 %   xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
 % end
-% %print('-depsc2','data/GMM-latentSpace-graph01.eps');
+% % %print('-depsc2','data/GMM-latentSpace-graph01.eps');

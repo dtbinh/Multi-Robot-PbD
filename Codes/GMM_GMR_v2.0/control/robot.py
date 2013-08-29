@@ -62,19 +62,19 @@ class ROBOT():
       if self.headTouch():
 	break
 
-  def pickBall(self):
+  def closeHand(self):
     headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value') 
     if headFront:
       self.motion.closeHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
-      self.speech.say("Pick object") 
+      self.speech.say("close hand") 
 
-  def dropBall(self):
+  def openHand(self):
     headRear = self.memory.getData('Device/SubDeviceList/Head/Touch/Rear/Sensor/Value')
     if headRear:
       self.motion.openHand(self.side+"Hand") 
       self.motion.setStiffnesses("RHand", 1.0)
-      self.speech.say("Drop object")
+      self.speech.say("open hand")
   
   def headTouch(self):
     headMiddle = self.memory.getData('Device/SubDeviceList/Head/Touch/Middle/Sensor/Value')
@@ -90,12 +90,13 @@ class ROBOT():
     ElbowYaw = self.memory.getData('Device/SubDeviceList/'+self.side+'ElbowYaw/Position/Sensor/Value')
     ElbowRoll = self.memory.getData('Device/SubDeviceList/'+self.side+'ElbowRoll/Position/Sensor/Value')
     WristYaw = self.memory.getData('Device/SubDeviceList/'+self.side+'WristYaw/Position/Sensor/Value')
-    Hand = self.memory.getData('Device/SubDeviceList/'+self.side+'Hand/Position/Sensor/Value')
+    #Hand = self.memory.getData('Device/SubDeviceList/'+self.side+'Hand/Position/Sensor/Value')
     # LHipYawPitch and RHipYawPitch share the same motor
-    LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
-    RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
-    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
+    #LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
+    #RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
+    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
     #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
+    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw]
     return result 
 
   def HandData(self):
