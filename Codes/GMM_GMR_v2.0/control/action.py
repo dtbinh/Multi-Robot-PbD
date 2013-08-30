@@ -17,7 +17,7 @@ def moveJoints(robot, action_name):
   
   #ballPos = [0.26, -0.20, 0.21]
   step = 1 
-  while (step < 141):
+  while (step < 272):
     print "step:  ", step
 
     '''
@@ -44,15 +44,15 @@ def moveJoints(robot, action_name):
     
     inDim = range(1, 2)
     #outDim = range(2,10)
-    outDim = range(2,7)
+    outDim = range(2,10)
     
     output = mlab.GMR(query, inDim, outDim)
     joints = []
     for index, item in enumerate(output):
       joints.append(float(item))
-    joints.append(1)
-    joints.append( -1.3)
-    joints.append( -1.3)
+    #joints.append(1)
+    #joints.append( -1.3)
+    #joints.append( -1.3)
     print "joints: ", joints, "\n"
     if all(item == 0 for item in joints):
       print "illegal joints, abandom"

@@ -25,8 +25,8 @@ def record(argv):
     ballPos = robot.BallData()
     sleep(1) 
 
-  #robot.motion.setStiffnesses("RHipPitch", 0.0)
-  #robot.motion.setStiffnesses("LHipPitch", 0.0)
+  robot.motion.setStiffnesses("RHipPitch", 0.0)
+  robot.motion.setStiffnesses("LHipPitch", 0.0)
   
   count = 0
   while not (robot.headTouch()):
@@ -36,7 +36,8 @@ def record(argv):
     if OBJECT:
       Data = str(ballPos) + " " + str(robot.HandData()) + " " + str(robot.JointData())
     else: 
-      Data = str(robot.HandData()) + " " + str(robot.JointData())
+      #Data = str(robot.HandData()) + " " + str(robot.JointData())
+      Data = str(robot.JointData())
     Data = Data + '\n'
     count += 1
     f.write(Data)

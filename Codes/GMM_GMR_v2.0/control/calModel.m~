@@ -5,70 +5,59 @@ function calModel()
     clear;
     
     path = 'data/';
-    numDemo = 3;
-    numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
- 
-%    delete('data/*.mat');
-%    flagDTW = 1;
-%    readAll(path, numDemo, numDim, flagDTW);
- 
+    numDemo = 5;
+    numDim = 8;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+
+%     delete('data/*.mat');
+%     flagDTW = 1;
+%     readAll(path, numDemo, numDim, flagDTW);
+    
     load('data/raw_all.mat');
     tmp = raw_all';
-    
-    % cal distance
-    tmp(1, :) = tmp(4, :) - tmp(1, :);
-    tmp(2, :) = tmp(5, :) - tmp(2, :);
-    tmp(3, :) = tmp(6, :) - tmp(3, :);
-
-    onetime = [1:size(tmp,2)/3];
-    timeDim = [onetime, onetime, onetime];
+        
+    % queried by time
+    onetime = [1:size(tmp,2)/numDemo];
+    timeDim = repmat(onetime, [1, numDemo]);
     Data =[timeDim; tmp];
     
+    % queried by ball-hand dist
     [nbVar, nbData] = size(Data);
     fprintf('size of Data: [%d, %d]\n',nbVar, nbData);
 
-  %  nbStates = BIC(Data, numDemo)
-
-    %% PCA
-    inputDist= Data(2:4, :);
-    inputHand = Data(5:7, :);
-    inputJoint = Data(8:end, :);
-    inputAll = Data(2:end, :);
-    threshold = 0.98;
-    
-    fprintf('ALL');
-    [Data2, A] = PCA(inputAll, threshold);
-    
-    % BIC
+    % Training model with PCA and BIC
     maxStates = 10;
-    nbStates = BIC(Data2, maxStates);
-    fprintf('nbStates %d\n', nbStates);
-    
-    %% Training of GMM by EM algorithm, initialized by k-means clustering.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [Priors2, Mu2, Sigma2] = trainModelwithPCA([timeDim;Data2], nbStates);
-    [Mu2, Sigma] = reproject(Mu2, Sigma2, A, nbStates);
-    Priros = Priors2;
+    threshold = 0.95;
+
+    %queried by time
+%   [Priors, Mu, Sigma] = trainModel([Data(1,:); Data(8:end,:)], maxStates);
+    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(2:end,:)], threshold, maxStates);
+%   [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime(Data(2:end,:), threshold, maxStates);
+  
+    %queried by object   
+%     [Priors, Mu, Sigma] = trainModelwithPCA([Data(1:4,:); Data(11:end, :)], threshold, maxStates);
+%     [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime([Data(1:4, :); Data(11:end, :)], threshold, maxStates);
+
+    Mu
     save('data/Priors.mat', 'Priors');
     save('data/Mu.mat', 'Mu');
     save('data/Sigma.mat', 'Sigma');
     
     %% Plotting    
-    nbVarDist = 3;
-    nbVarHand = 3;
-    nbVarJoints = 8;
-    
-  
-    
-    %plot hand-ball distance
-    nbVar = nbVarDist;
-    for n=1: nbVar
-      subplot(nbVar, 1, n);
-      hold on;
-      plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
-      axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
-      xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
-    end
+%    nbVarDist = 3;
+%    nbVarHand = 3;
+%    nbVarJoints = 8;
+%     
+%   
+%     
+%     %plot hand-ball distance
+%     nbVar = nbVarDist;
+%     for n=1: nbVar
+%       subplot(nbVar, 1, n);
+%       hold on;
+%       plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
+%       axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
+%       xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
+%     end
 %     
 %     figure;
 %     %plot hand
