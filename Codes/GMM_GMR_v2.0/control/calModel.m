@@ -6,15 +6,15 @@ function calModel()
     
     path = 'data/';
     numDemo = 4;
-    numDim = 8;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+    numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
 
-%     delete('data/*.mat');
-%     flagDTW = 1;
-%     readAll(path, numDemo, numDim, flagDTW);
+    delete('data/*.mat');
+    flagDTW = 1;
+    readAll(path, numDemo, numDim, flagDTW);
     
     load('data/raw_all.mat');
     tmp = raw_all';
-        
+    
     % queried by time
     onetime = [1:size(tmp,2)/numDemo];
     timeDim = repmat(onetime, [1, numDemo]);
@@ -26,11 +26,11 @@ function calModel()
 
     % Training model with PCA and BIC
     maxStates = 10;
-    threshold = 0.95;
+    threshold = 0.98;
 
     %queried by time
 %   [Priors, Mu, Sigma] = trainModel([Data(1,:); Data(8:end,:)], maxStates);
-    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(2:end,:)], threshold, maxStates);
+    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates);
 %   [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime(Data(2:end,:), threshold, maxStates);
   
     %queried by object   

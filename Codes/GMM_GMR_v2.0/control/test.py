@@ -84,4 +84,22 @@ def test_getAngles(robot):
     useSensor = True
     sensorAngles = robot.motion.getAngles(names, useSensor)
     print names, ":  ", sensorAngles
-    
+   
+def test_ForwardKinect(robot):
+  while not robot.headTouch():
+    joint = robot.JointData()
+    #print "joint: ", joint
+    handRead = robot.HandData()
+    print "handRead: ", handRead
+    output = mlab.testForwardKinect([joint])
+    handComp = []
+    for index, item in enumerate(output):
+      handComp.append(float(item))
+    print "handComp: ", handComp
+  
+    diff = [a-b for a, b in zip(handRead,  handComp)]
+    percent_diff = [(a-b)/a for a, b in zip(handRead,  handComp)]
+
+    print "diff: ", diff
+    print "percent_diff: ", percent_diff, "\n\n"
+ 

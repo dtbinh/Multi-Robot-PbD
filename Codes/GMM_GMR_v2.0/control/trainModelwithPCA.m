@@ -21,17 +21,17 @@ nbVar2 = nbPC+1;
 Data2(1,:) = Data(1,:);
 Data2(2:nbVar2,:) = A' * centeredData;
 A'
-% a = A';
-% %importantDim = zeros(size(a,1));
-% for i = 1: size(a,1)
-%     importantDim(i) = find(a(i, :)==max(a(i, :)));
-% end
+a = abs(A');
+%importantDim = zeros(size(a,1));
+for i = 1: size(a,1)
+    importantDim(i) = find(a(i, :)==max(a(i, :)));
+end
+
+importantDim
+% for i = 1 : size(a, 2)
+%     for j = 1 : size(importantDim)
+%     if importantDim(i) ~= i
 % 
-% importantDim
-% % for i = 1 : size(a, 2)
-% %     for j = 1 : size(importantDim)
-% %     if importantDim(i) ~= i
-% % 
 evalIndex = 0;
 
 % evalMx = abs(sum(abs(A')))

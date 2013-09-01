@@ -36,8 +36,8 @@ def record(argv):
     if OBJECT:
       Data = str(ballPos) + " " + str(robot.HandData()) + " " + str(robot.JointData())
     else: 
-      #Data = str(robot.HandData()) + " " + str(robot.JointData())
-      Data = str(robot.JointData())
+      Data = str(robot.HandData()) + " " + str(robot.JointData())
+      #Data = str(robot.JointData())
     Data = Data + '\n'
     count += 1
     f.write(Data)

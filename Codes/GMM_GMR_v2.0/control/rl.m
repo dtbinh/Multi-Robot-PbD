@@ -12,6 +12,14 @@ function Mu = rl(Mu, score)
     save('data/Mu.mat', 'Mu');
 end
 
+goal = 0.32;
 
-
-function r = reward()
+function r = reward(joint, goal)
+    hand = testForwardKinect(joint);
+    % estimated hand pos between [goal-0.5, goal+0.5]
+    if hand(3) < goal+0.005 && hand(3) > goal - 0.005
+        r = 1.0
+    else
+        r = 0
+    end
+end
