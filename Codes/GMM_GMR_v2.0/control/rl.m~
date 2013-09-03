@@ -13,7 +13,7 @@ function Mu = rl(Mu, DoFs)
     %3D matrix of state, 4D Q
     state = zeros(nbRange, nbState, nbDoFs);  
     for i = 1 : nbDoFs
-        step(i)  = (max(Mu(1+DoFs(i), :)) - min(Mu(1+DoFs(i), :))) / nbState;
+        step(i)  = (max(Mu(1+DoFs(i), :)) - min(Mu(1+DoFs(i), :))) / nbState * 4;
         for j = 1 : nbState
             state(1, j, i) = Mu(1+DoFs(i), j) + 2 * step(i);
             state(2, j, i) = Mu(1+DoFs(i), j) + step(i);
@@ -104,10 +104,6 @@ function Mu = rl(Mu, DoFs)
                     a = a_new;
                 end % j nbState
             end % i nbDoFs
-            if follow_counter ~= 0
-                follow_counter
-                pause;
-            end
             if follow_counter > 100
                 break;
             end
@@ -158,13 +154,13 @@ function r = reward(Mu_new, Jacobian)
    % pause;
     r = 0;
     % estimated hand pos between [goal-0.5, goal+0.5]
-    for i = 100:110
-        fprintf('hand(%d, 3): %f\n', i, hand(i, 3));
-        if hand(i, 3) > goal+0.01 || hand(i, 3) < goal - 0.01
+    for i = 100:105
+        hand(i, 3)
+        if hand(i, 3) < goal+0.005 && hand(i, 3) > goal - 0.005
+            r = 0;
+        else
             r = -1;
             break;
-        %else
-        %    pause;
         end
     end
     
