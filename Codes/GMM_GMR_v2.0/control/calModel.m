@@ -25,18 +25,13 @@ function calModel()
     fprintf('size of Data: [%d, %d]\n',nbVar, nbData);
 
     % Training model with PCA and BIC
-    maxStates = 10;
+    maxStates = 5;
     threshold = 0.98;
 
     %queried by time
 %   [Priors, Mu, Sigma] = trainModel([Data(1,:); Data(8:end,:)], maxStates);
     [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates);
 %   [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime(Data(2:end,:), threshold, maxStates);
-  
-    %queried by object   
-%     [Priors, Mu, Sigma] = trainModelwithPCA([Data(1:4,:); Data(11:end, :)], threshold, maxStates);
-%     [Priors, Mu, Sigma] = trainModelwithPCAWithoutTime([Data(1:4, :); Data(11:end, :)], threshold, maxStates);
-
     
     save('data/Priors.mat', 'Priors');
     save('data/Mu.mat', 'Mu');

@@ -1,5 +1,5 @@
-function result = testForwardKinect(input)
-   load('data/a.mat');
+function result = testForwardKinect(input, a)
+%   a = forwardKinect();
 %    load('data/raw_1.mat');
 %    tmp = raw_1';    
 %    hand = tmp(1:6, :);

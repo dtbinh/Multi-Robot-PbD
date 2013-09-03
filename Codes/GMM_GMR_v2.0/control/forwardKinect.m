@@ -1,15 +1,5 @@
     
 function a = forwardKinect()
-   clc;
-   clear; 
-    path = 'data/';
-    numDemo = 4;
-    numDim = 14;    % 3 ball position + 3 hand position + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
-
-    delete('data/*.mat');
-     flagDTW = 1;
-     readAll(path, numDemo, numDim, flagDTW);
-    
     load('data/raw_all.mat');
     tmp = raw_all';    
     hand = tmp(1:6, :);
@@ -30,14 +20,14 @@ function a = forwardKinect()
             result(i) = [joint(:, i)]' * a(2:end, dim) + a(1, dim);
         end
      
-        figure;
-        plot(result, 'ro'); hold on;
-        plot(hand(dim, :), 'g');
+%         figure;
+%         plot(result, 'ro'); hold on;
+%         plot(hand(dim, :), 'g');
 
     end
    % test with testing data 
    % testforwardKinect(a);
     save('data/a.mat', 'a');
-    pause;
-    close all;
+   % pause;
+   % close all;
 end
