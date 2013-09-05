@@ -114,14 +114,12 @@ end
 function r = reward(Mu, DoFs, s, Jacobian)
     nbState = size(s, 2);
     step  = (max(Mu(1+DoFs, :)) - min(Mu(1+DoFs, :))) / nbState;
-   
-    state(1, :) = Mu(1+DoFs, :) + 5 * step ;
-    state(2, :) = Mu(1+DoFs, :) + 4 * step ;
+    state(1, :) = Mu(1+DoFs, :) + 2 * step ;
+    state(2, :) = Mu(1+DoFs, :) + step ;
     state(3, :) = Mu(1+DoFs, :);
     state(4, :) = Mu(1+DoFs, :) - step ;
     state(5, :) = Mu(1+DoFs, :) - 2 * step ;
-    state(6, :) = Mu(1+DoFs, :) 
-    
+
     for i = 1 : nbState
          path(i) = state(s(i), i); 
     end

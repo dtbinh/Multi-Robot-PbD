@@ -1,4 +1,4 @@
-function [Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA(Data, threshold, maxStates)
+function [Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA(Data, threshold, maxStates, flagDTW)
 
 [nbVar,nbData] = size(Data);
 
@@ -8,6 +8,17 @@ nbPC = numPCA(Data(2:end, :), threshold);
 
 %% PCA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%DTW
+if flagDTW
+    disp('Align raw_all with DTW.');
+    [w, new] = dtwMD([Data(:, 201:400)]', [Data(:,1:200)]');
+    Data(:,201:400) = new';
+    [w, new] = dtwMD([Data(:, 401:600)]', [Data(:,1:200)]');
+    Data(:,401:600) = new';
+    [w, new] = dtwMD([Data(:, 601:800)]', [Data(:,1:200)]'); 
+    Data(:,601:800) = new';
+end
+
 %Re-center the data
 Data_mean = repmat(mean(Data(2:end,:),2), 1, nbData);
 centeredData = Data(2:end,:) - Data_mean;
@@ -68,7 +79,7 @@ figure('position',[50,50,1000,400]);
 for n=1:nbVar-1
   subplot(nbVar-1,2,(n-1)*2+1); hold on;
   plotGMM(Mu([1,n+1],:), Sigma([1,n+1],[1,n+1],:), [0 .8 0], 1);
-  plot(Data(1,:), Data(n+1,:), 'x', 'markerSize', 4, 'color', [.1 .1 .1]);
+  plot(Data(1,:), Data(n+1,:), 'x', 'markerSize', 3, 'color', [.1 .1 .1]);
   axis([min(Data(1,:)) max(Data(1,:)) min(Data(n+1,:))-0.01 max(Data(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['x_' num2str(n)],'fontsize',16);
 end
@@ -76,7 +87,7 @@ end
 for n=1:nbVar2-1
   subplot(nbVar-1,2,(n-1)*2+2); hold on;
   plotGMM(Mu2([1,n+1],:), Sigma2([1,n+1],[1,n+1],:), [.8 0 0], 1);
-  plot(Data2(1,:), Data2(n+1,:), 'x', 'markerSize', 4, 'color', [.3 .3 .3]);
+  plot(Data2(1,:), Data2(n+1,:), 'x', 'markerSize', 3, 'color', [.3 .3 .3]);
   axis([min(Data2(1,:)) max(Data2(1,:)) min(Data2(n+1,:))-0.01 max(Data2(n+1,:))+0.01]);
   xlabel('t','fontsize',16); ylabel(['\xi_' num2str(n)],'fontsize',16);
 end

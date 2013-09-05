@@ -16,8 +16,8 @@ function result = BIC(Data, maxStates)
             L(nbStates) = L(nbStates) + log(Pj);
         end
         np = (nbStates - 1) + nbStates*(nbVar + 0.5*nbVar*(nbVar+1));
-        panlty(nbStates) = np/2 * log(nbData);
-        S(nbStates) = -L(nbStates) + panlty(nbStates);
+        panlty(nbStates) = np / 2 * log(nbData);
+        S(nbStates) = - L(nbStates) + panlty(nbStates);
     end
 
   hold on;

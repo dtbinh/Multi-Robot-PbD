@@ -19,7 +19,7 @@ if col_r ~= col_t
     return;
 else
     col = col_r;
-    fprintf('\tDimension check : Success. (=%d)\n', col);
+    fprintf('\tDTW Dimension check\t...\tSuccess. (=%d)\n', col);
 end
 
 %Compute distance
