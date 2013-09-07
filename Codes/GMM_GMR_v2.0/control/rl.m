@@ -1,45 +1,51 @@
-function Mu = rl(Mu, DoFs)
+%function Mu = rl(Mu, DoFs)
+function Mu = rl()
+    load('data/Mu.mat');
+    DoFs = 1;
+       
+    % params
+    nbRange = 5;
     gamma = 0.8;
     lambda = 0.9;
     alpha = 0.6;
     epsilon = 0.3;
-    
-    [nbVar, nbState] = size(Mu);
-    nbRange = 5;
         
+    Jacobian = forwardKinect();
+    nbState = size(Mu, 2);
+    joint_mu_matrix = zeros(nbRange, nbState);
+    step  = (max(Mu(1+DoFs, :)) - min(Mu(1+DoFs, :))) / nbState;
+    for i = 1 : nbState
+        joint_mu_matrix(1, i) = Mu(1+DoFs, i) - 2 * step;
+        joint_mu_matrix(2, i) = Mu(1+DoFs, i) - step;
+        joint_mu_matrix(3, i) = Mu(1+DoFs, i);
+        joint_mu_matrix(4, i) = Mu(1+DoFs, i) + step;
+        joint_mu_matrix(5, i) = Mu(1+DoFs, i) + 2 * step;
+        
+    end
+    
     % initilize Q, e
-    Q = rand([power(nbRange, nbState), power(3, nbState)]);
+    Q = rand([power(nbRange, nbState), power(nbRange, nbState)]);
     e = zeros(size(Q));
    
-    Jacobian = forwardKinect();
 
     % training
     % each episode
     for episode = 1 : 1000
-       
-        %initialize s, a
+        %initialize s, a to 0
         s = 3 * ones(1, nbState);
         s_new = zeros(size(s));
-        a = ones(1, nbState);
+        a = randi(nbRange, [1, nbState]);
         a_new = zeros(size(a));
-        
-        % repeat for each step in one episode (update one data point)
+
+        % repeat for each step in one episode
+        %step = 0;
         for step = 1 : 200
-            fprintf('episode %d, step %d\n', episode, step);                     
-            % take action a, 0:stay, 2:increase, 3:decrease, get s_new
-            for j = 1 : nbState
-                if a(j) == 1
-                    s_new(j) = s(j);
-                elseif a(j) == 2
-                    s_new(j) = s(j) + 1;
-                elseif a(j) == 3
-                    s_new(j) = s(j) - 1;
-                else
-                    disp('Wrong action!');
-                end
-            end
+            fprintf('episode %d, step %d\n', episode, step);      
+            
+            % take action from 1 ~ nbRange, observer new state
+            s_new = a;
             % observe reward
-            rwd = reward(Mu, DoFs, s_new, Jacobian);
+            rwd = reward(Mu, DoFs, s_new, joint_mu_matrix, Jacobian);
             %fprintf('rwd %f\n', rwd);
 
             if rwd >= 0
@@ -51,8 +57,8 @@ function Mu = rl(Mu, DoFs)
             % choose a_new, greedy
             a_new = greedy(s_new,Q);
 
-            delta = rwd + gamma * Q(indexS(s_new), indexA(a_new)) - Q(indexS(s), indexA(a));
-            e(indexS(s), indexA(a)) = e(indexS(s), indexA(a)) + 1; 
+            delta = rwd + gamma * Q(index(s_new), index(a_new)) - Q(index(s), index(a));
+            e(index(s), index(a)) = e(index(s), index(a)) + 1; 
             % update Q, e
             Q = Q + alpha * delta * e;
             e = gamma * lambda * e;
@@ -66,8 +72,7 @@ function Mu = rl(Mu, DoFs)
     %save('data/Mu.mat', 'Mu');
 end
 
-function val = indexS(s)
-    % base = nbRange
+function val = index(s)
     base = 5;
     s = fliplr(s);
     val = 0;
@@ -77,62 +82,33 @@ function val = indexS(s)
     val = val + 1;
 end
 
-function val = indexA(a)
-    % base = # of action directions
-    base = 3;
-    s = fliplr(s);
-    val = 0;
-    for i = size(s, 2) :-1: 1
-        val = val + (s(i)-1) * power(base, i-1);
-    end    
-    val = val + 1;
+function x = decode(a)
+    x = zeros(1, 6);
+    a = a - 1;
+    for i = 6 : -1 :1
+        x(i) = mod(a, 5) + 1;
+        a = fix(a/5);
+    end
+
 end
 
 function a = greedy(s, Q)
-    for i = 1 : size(s, 2)
-        % highest level
-        if s(i) == 1
-            if Q(index(s(i)), 1) > Q(index(s(i)), 3)
-                a = 1;  %stay
-            else
-                a = 3;  %decrease
-            end
-        % lowest level
-        elseif s(i) == 5       
-            if Q(index(s(i)), 1) > Q(index(s(i)), 2)
-                a = 1;  %stay
-            else
-                a = 2;  %increase
-            end
-        else
-            line = Q(index(s(i)),:);
-            a = find(line==max(line));
-        end
-    end
+    line = Q(index(s), :);
+    a = find(line==max(line));
+    a = decode(a);
 end
 
-function r = reward(Mu, DoFs, s, Jacobian)
-    nbState = size(s, 2);
-    step  = (max(Mu(1+DoFs, :)) - min(Mu(1+DoFs, :))) / nbState;
-   
-    state(1, :) = Mu(1+DoFs, :) + 5 * step ;
-    state(2, :) = Mu(1+DoFs, :) + 4 * step ;
-    state(3, :) = Mu(1+DoFs, :);
-    state(4, :) = Mu(1+DoFs, :) - step ;
-    state(5, :) = Mu(1+DoFs, :) - 2 * step ;
-    state(6, :) = Mu(1+DoFs, :) 
-    
-    for i = 1 : nbState
-         path(i) = state(s(i), i); 
-    end
+function r = reward(Mu, DoFs, s, joint_mu_matrix, Jacobian)   
+    nbState = size(Mu, 2);
     Mu_new = Mu;
-    Mu_new(1+DoFs, :) = path;
-    
+    for i = 1 : nbState
+        Mu_new(1+DoFs, i) = joint_mu_matrix(s(i), i);
+    end
     goal = 0.32;
-    queryTime = [1:263];
+    queryTime = [1:200];
     joint = GMRwithParam(queryTime, [1], [2:9], Mu_new);
     
-    for i = 1 : 263
+    for i = 1 : 200
         hand(i, :) = testForwardKinect([joint(:, i)]', Jacobian);
     end
    % figure;
@@ -140,7 +116,7 @@ function r = reward(Mu, DoFs, s, Jacobian)
    % pause;
     r = 0;
     % estimated hand pos between [goal-0.5, goal+0.5]
-    for i = 100:110
+    for i = 40:160
         %fprintf('hand(%d, 3): %f\n', i, hand(i, 3));
         if hand(i, 3) > goal+0.01 || hand(i, 3) < goal - 0.01
             r = -1;
