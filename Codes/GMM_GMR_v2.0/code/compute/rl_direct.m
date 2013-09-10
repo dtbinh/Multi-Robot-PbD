@@ -5,34 +5,30 @@ clear;
     path = '../data/';
     load([path, 'Mu.mat']);
 
-    sim_hand = reproduce();
-    goal = sim_hand;
-    goal(:, 3) = sim_hand(:, 3) - 0.0235;
 
-    %plot(sim_hand(:,3), 'r'); hold on;
-    %plot(goal(:,3));
+    [hand_std, joint_std] = reproduce();
+    wall = hand_std;
+    wall(32:172, 3) = hand_std(32:172, 3) - 0.0235;
+
+    plot(hand_std(:,3), 'r'); hold on;
+    plot(wall(:,3));
 	DoFs = 1;
  
-    % params
-    nbRange = 5;
-    nbAct = 3;  % 3 actions: 1-stay, 2-increase, 3-decrease
+    
+    
+    
+    % define state and action
+    action = 0; % 0, 1, -1
+    state = [0, 0, 0]; % 0, 1, -1
+    
+    %nbRange = 5;
+    %nbAct = 3;  % 3 actions: 1-stay, 2-increase, 3-decrease
+    
+    %params
 	gamma = 0.8;
     lambda = 0.1;
     alpha = 0.6;
-    
-    Jacobian = forwardKinect();
-    nbState = size(Mu, 2);
-    joint_mu_matrix = zeros(nbRange, nbState);
-    gap  = (max(Mu(1+DoFs, :)) - min(Mu(1+DoFs, :))) / nbState;
-    gap
-    for i = 1 : nbState
-        joint_mu_matrix(1, i) = Mu(1+DoFs, i);
-         joint_mu_matrix(2, i) = Mu(1+DoFs, i) + 2 * gap;
-         joint_mu_matrix(3, i) = Mu(1+DoFs, i) + 3 * gap;
-         joint_mu_matrix(4, i) = Mu(1+DoFs, i) + 4 * gap;
-         joint_mu_matrix(5, i) = Mu(1+DoFs, i) - gap;
-    end
-    
+   
 
     % initilize Q, e
     Q = rand([power(nbRange, nbState), power(nbAct, nbState)]);		% 5^6 * 3^6
@@ -60,8 +56,8 @@ clear;
 			% take action from 1 ~ nbRange, observer new state
             s_new = takeAction(s,  a);
             % observe reward
-            goal(step, 3)
-            [rwd, h] = reward(step, Mu, DoFs, s_new, joint_mu_matrix, Jacobian, goal(step, 3));
+            wall(step, 3)
+            [rwd, h] = reward(step, Mu, DoFs, s_new, joint_mu_matrix, Jacobian, wall(step, 3));
             %fprintf('rwd %f\n', rwd);
 			
             if rwd == 1 
@@ -199,7 +195,7 @@ function best = greedy(s, Q, total_step, nbRange, nbState, nbAct)
 	end
 end
 
-function [r, hand] = reward(queryTime, Mu, DoFs, s, joint_mu_matrix, Jacobian, goal) 
+function [r, hand] = reward(queryTime, Mu, DoFs, s, joint_mu_matrix, Jacobian, wall) 
    nbState = size(Mu, 2);
    Mu_new = Mu;
    for i = 1 : nbState
@@ -211,7 +207,7 @@ function [r, hand] = reward(queryTime, Mu, DoFs, s, joint_mu_matrix, Jacobian, g
 
    hand = testForwardKinect([joint]', Jacobian);
  
-   fprintf('hand %f\t, goal %f\t, diff %f\n', hand(3), goal, hand(3)-goal);
+   fprintf('hand %f\t, wall %f\t, diff %f\n', hand(3), wall, hand(3)-wall);
     
     if queryTime < 32 || queryTime > 171
         if hand(3) < 0.33
@@ -220,11 +216,11 @@ function [r, hand] = reward(queryTime, Mu, DoFs, s, joint_mu_matrix, Jacobian, g
             r = 1;
         end
     else
-        if abs(hand(3) - goal) > 0.005
+        if abs(hand(3) - wall) > 0.005
             r = -1;
         else
             r = 1;
-            %r = 1 - abs(hand(3) - goal) * 100;
+            %r = 1 - abs(hand(3) - wall) * 100;
         end
     end
 end

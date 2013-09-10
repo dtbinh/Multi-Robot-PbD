@@ -19,7 +19,7 @@ function result = BIC(Data, maxStates)
         panlty(nbStates) = np / 2 * log(nbData);
         S(nbStates) = - L(nbStates) + panlty(nbStates);
     end
-
+  figure;
   hold on;
   plot(-L, 'g');
   plot(panlty, 'r');
@@ -27,4 +27,12 @@ function result = BIC(Data, maxStates)
   A = S;
   result = find(A==((min(A))));
   
+end
+
+function [Priors, Mu, Sigma] = GMM(Data, nbStates)
+
+    % plain training
+    [Priors, Mu, Sigma] = EM_init_kmeans(Data, nbStates);
+    [Priors, Mu, Sigma] = EM(Data, Priors, Mu, Sigma);
+
 end

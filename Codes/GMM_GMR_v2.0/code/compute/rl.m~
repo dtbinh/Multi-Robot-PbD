@@ -227,4 +227,6 @@ function [r, hand] = reward(queryTime, Mu, DoFs, s, joint_mu_matrix, Jacobian, g
             %r = 1 - abs(hand(3) - goal) * 100;
         end
     end
+    
+    r
 end

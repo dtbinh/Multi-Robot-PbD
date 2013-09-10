@@ -25,7 +25,7 @@ function [prinDim, unprinDim, Data2, A, Data_mean] = DR(Data, nbPC)
         if ismember(i, prinDim) == 0
            tmp = [i, sum(a(:,i))];
 
-            if i == 1
+            if j == 1
                 unprinDim = tmp;
             else
                 unprinDim = [unprinDim; tmp];

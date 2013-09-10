@@ -1,0 +1,38 @@
+function hand = compareHand()
+    load('../data/Mu.mat');
+    Mu_new = Mu;
+    
+    gap = 0.0406;
+    s = [4,1,4,5,1,5];
+    for i = 1 : 6
+        switch s(
+        if s(i) == 1;
+            s(i) = 0;
+        else
+    end
+    Mu_new(2, 1) = Mu(2, 1) + s(1) * gap;
+    Mu_new(2, 2) = Mu(2, 1) + s(2) * gap;
+    Mu_new(2, 3) = Mu(2, 1) + s(3) * gap;
+    Mu_new(2, 4) = Mu(2, 1) + s(4) * gap;
+    Mu_new(2, 5) = Mu(2, 1) + s(5) * gap;
+    Mu_new(2, 6) = Mu(2, 1) + s(6) * gap;
+
+    length = 200;
+    
+    Jacobian = forwardKinect();
+    hand = zeros(length, 6);
+    for time = 1 : length
+        joint = GMRwithParam(time, 1, [2:9], Mu);
+        joint_new = GMRwithParam(time, 1, [2:9], Mu_new);
+        
+        hand(time, :) = testForwardKinect([joint]', Jacobian);
+        hand_new(time, :) = testForwardKinect([joint_new]', Jacobian);
+
+    end
+    
+    diff = hand_new(:,3) - hand(:,3)
+    plot(hand(:,3), 'b'); hold on;
+    plot(hand_new(:,3), 'r');
+    
+    %save('../data/reproduce.mat', 'hand');
+end
