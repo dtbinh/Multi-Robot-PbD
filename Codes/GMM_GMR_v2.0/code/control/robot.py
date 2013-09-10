@@ -1,8 +1,6 @@
 import sys, os
 from time import *
 from naoqi import *
-from time import *
-from mlabwrap import mlab
 
 class ROBOT():
   def __init__(self, ip, port, side):
@@ -15,53 +13,6 @@ class ROBOT():
     self.redballtracker = ALProxy('ALRedBallTracker', self.ip, self.port)
     self.speech = ALProxy('ALTextToSpeech', self.ip, self.port)
 	
-  def searchBall(self):
-    self.motion.setStiffnesses("Head", 1.0)
-    self.mouthCam()
-    sleep(1)
-    self.redballtracker.stopTracker()
-    self.redballtracker.startTracker()
-    print self.redballtracker.getPosition()
-    if not self.redballtracker.isActive():
-      self.speech.say('Can not start tracking')
-      self.exit()
-    
-    angle = 0.5
-    speed = 0.1
-    while True:
-      self.mouthCam()
-      sleep(1)
-      if not self.redballtracker.isActive():
-        self.speech.say('Can not start tracking')
-        self.exit()
-      self.speech.say("Search")
-      
-      self.motion.setAngles("HeadYaw", 0.5, speed)
-      sleep(2)
-      if self.redballtracker.isNewData():
-        self.speech.say("new ball, start tracking")
-        break 
-      
-      self.motion.setAngles("HeadPitch", 0.5, speed)
-      sleep(2)
-      if self.redballtracker.isNewData():
-        self.speech.say("new ball, start tracking") 
-        break 
-      
-      self.motion.setAngles("HeadYaw", -0.5, speed)
-      sleep(2)
-      if self.redballtracker.isNewData():
-        self.speech.say("new ball, start tracking") 
-        break 
-      
-      self.motion.setAngles("HeadPitch", -0.1, speed)
-      sleep(2)
-      if self.redballtracker.isNewData():
-        self.speech.say("new ball") 
-        break 
-      if self.headTouch():
-	break
-
   def closeHand(self):
     headFront = self.memory.getData('Device/SubDeviceList/Head/Touch/Front/Sensor/Value') 
     if headFront:
@@ -111,34 +62,10 @@ class ROBOT():
     #return data[0:3]
     return data
 
-  def BallData(self):
-    if not self.redballtracker.isActive():
-      print "Tracker is not active."
-      self.speech.say('Fail tracking')
-      self.exit()
-    
-    ball =[]
-    counter = 100
-    while counter > 0:
-      tmp = self.redballtracker.getPosition()
-      if all(item < 1 for item in tmp):
-        #print tmp
-        ball.append(tmp)
-        counter = counter - 1
-      else:
-        print tmp, "illegal ball position, abandon"
-    ballPos = mlab.removeAbnormal(ball)
-    ballPos = ballPos[0]
-    ballPos = ballPos.tolist()
-    #print "robot.py ballPos: ", ballPos, "type", type(ballPos)
-    return ballPos 
-
- 
   def fixLegs(self):
     self.motion.setStiffnesses("Body", 0.0)
     RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
     LLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
-    #timeLists = [1, 2, 3, 4, 5, 6]
     timeLists = 2.0
     isAbsolute = True
     
@@ -154,10 +81,6 @@ class ROBOT():
     print "Leg stiffnesses set."
     self.speech.say("I'm ready.")
 
-  def mouthCam(self):
-    while self.camera.getParam(18) == 0:
-      self.camera.setParam(18, 1)
-
   def exit(self):
     try:
       while self.redballtracker.isActive():
@@ -171,25 +94,3 @@ class ROBOT():
       self.speech.say('Cannot relax')
     
     self.speech.say('Exit normaly')
-
-def takePicture(robot, imgName):
-    print ">>> Start taking picture: ", imgName
-    resolution = 2 #VGA, higher than kQQVGA
-    colorSpace = 11 #RGB
-    videoClient = robot.camera.subscribe("python_client", resolution, colorSpace, 5)
-
-    time.sleep(1)
-    t0 = time.time()
-    naoImage = robot.camera.getImageRemote(videoClient)
-    t1 = time.time()
-    print "\t\tacquistion delay", t1 - t0
-    robot.camera.unsubscribe(videoClient)
-
-    imageWidth = naoImage[0]
-    imageHeight = naoImage[1]
-    array = naoImage[6]
-    im = Image.fromstring("RGB", (imageWidth, imageHeight), array)
-
-    im.save("../data/wiping/img/"+imgName+".png", "PNG")
-    im.show()
-    print ">>> Finish taking picture"
