@@ -20,12 +20,12 @@ function calModel()
     [nbVar, nbData] = size(tmp_all);
     fprintf('size of all data: [%d, %d]\n',nbVar, nbData);
     joint = tmp_all(7:end, :);
-    size(joint)
 
     %compute number of PCA for joint
     threshold = 0.98;
-    nbPC = numPCA(joint, threshold);
-
+    [nbPC, percent] = numPCA(joint, threshold);
+    fprintf('percent %f%%\n', percent'*100);
+    
     % DTW
     flagDTW = 1;
     if flagDTW == 1
@@ -33,10 +33,11 @@ function calModel()
     end
     
     % dimension extration by PCA
-    [prinDim, unprinDim, joint2, A, Data_mean] = DR(joint, nbPC);
-
+    [prinDim, unprinDim, joint2, A] = DR(joint, nbPC);
+    prinDim
+    unprinDim
     % compute # of GMM by BIC
-    maxStates = 6;
+    maxStates =  6;
     nbStates = BIC(joint2, maxStates);
     fprintf('nbStates %d\n', nbStates);
 
@@ -45,14 +46,23 @@ function calModel()
     timeDim = repmat(onetime, [1, numDemo]);
     Data = [timeDim; joint];
     Data2 = [timeDim; joint2];
-    fprintf('size of Data %d\t\t Data2 %d\n',size(Data), size(Data2));
+    %fprintf('size of Data %d\t\t Data2 %d\n',size(Data), size(Data2));
     [Priors, Mu, Sigma] = GMM_reproject(Data, Data2, nbStates, A);
-    
+
     %save params
     save([path, 'Priors.mat'], 'Priors');
     save([path, 'Mu.mat'], 'Mu');
     save([path, 'Sigma.mat'], 'Sigma');
 
+    % plot 3D trajectory
+    Jacobian = forwardKinect();
+    hand = zeros(length, 6);
+    for time = 1 : length
+        joint = GMR(time, 1, [2:9]);
+        hand(time, :) = testForwardKinect([joint]', Jacobian);
+    end
+    figure;
+    plot3(hand(:, 1), hand(:, 2), hand(:, 3));grid on;
    pause;
    close all;
 

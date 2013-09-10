@@ -1,9 +1,9 @@
 % Compute the number of PCs
-function nbPC = numPCA(input, threshold)
+function [nbPC, percent] = numPCA(input, threshold)
     input = input';
     [pc,score,latent,tsquare] = princomp(input);    
     percent = cumsum(latent)./sum(latent);
-    percent
+    
     
 %     plot(percent, 'LineWidth', 3); hold on;
 %     plot(5, percent(5), 'r.', 'MarkerSize', 30);

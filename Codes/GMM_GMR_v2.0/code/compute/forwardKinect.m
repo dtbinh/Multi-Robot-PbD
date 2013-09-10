@@ -1,6 +1,6 @@
     
 function a = forwardKinect()
-    load('data/raw_all.mat');
+    load('../data/raw_all.mat');
     tmp = raw_all';    
     hand = tmp(1:6, :);
     joint = tmp(7:end, :);
@@ -27,7 +27,7 @@ function a = forwardKinect()
     end
    % test with testing data 
    % testforwardKinect(a);
-    save('data/a.mat', 'a');
+    save('../data/a.mat', 'a');
    % pause;
    % close all;
 end

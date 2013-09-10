@@ -5,7 +5,6 @@ function [prinDim, unprinDim, Data2, A, Data_mean] = DR(Data, nbPC)
    
     %Re-center the data
     Data_mean = repmat(mean(Data,2), 1, nbData);
-    size(Data_mean)
     centeredData = Data - Data_mean;
     %Extract the eigencomponents of the covariance matrix 
     [E,v] = eig(cov(centeredData'));

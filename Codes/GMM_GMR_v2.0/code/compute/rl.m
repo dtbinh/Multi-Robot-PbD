@@ -2,8 +2,9 @@
 function Mu = rl()
 clc;
 clear;
-    load('data/Mu.mat');
-	load('data/goal.mat');
+    path = '../data/'
+    load([path, 'Mu.mat']);
+	load([path, '/goal.mat']);
     
 	DoFs = 1;
     
