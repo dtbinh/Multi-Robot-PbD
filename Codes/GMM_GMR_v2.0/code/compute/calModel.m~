@@ -1,0 +1,66 @@
+%Main computation function
+function calModel()
+    clc;
+    clear;
+    
+    path = '../data/';
+    numDemo = 4;
+    numDim = 14;    % 6 hand pos + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+
+   %read raw data to .mat
+%    delete([path, '*.mat']);
+%    read2mat(path, numDemo, numDim);
+    
+    % assemble raw to raw_all to the same length
+    length = 200;
+    raw_all = assemble2one(path, numDemo, numDim, length);
+    
+    
+    tmp_all = raw_all';
+    [nbVar, nbData] = size(tmp_all);
+    fprintf('size of all data: [%d, %d]\n',nbVar, nbData);
+    joint = tmp_all(7:end, :);
+    
+
+    %compute number of PCA for joint
+    threshold = 0.98;
+    nbPC = numPCA(joint, threshold);
+
+    % DTW
+    flagDTW = 1;
+    if flagDTW == 1
+        joint = DTW(joint, length);
+    end
+    
+    % dimension extration by PCA
+    [prinDim, unprinDim, Data2, A, Data_mean] = DR(joint, nbPC);
+
+    % compute # of GMM by BIC
+    maxStates = 8;
+    %nbStates = BIC(Data2, maxStates);
+    %fprintf('nbStates %d\n', nbStates);
+
+    % train GMMData_mean
+    onetime = [1:length];
+    timeDim = repmat(onetime, [1, numDemo]);
+    Data = [timeDim; tmp_all];
+    size(Data)
+    Data2 = [timeDim; Data2];
+    size(Data2)
+    nbStates = 6;
+    [Priors, Mu, Sigma, evalIndex] = GMM_reproject(Data2, nbStates, A, Data_mean);
+
+%[Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:);Data(8:end,:)], threshold, maxStates, flagDTW, length);
+   
+    % reprojection
+    
+    
+    %save params
+    %save('data/Priors.mat', 'Priors');
+    %save('data/Mu.mat', 'Mu');
+    %save('data/Sigma.mat', 'Sigma');
+
+%    pause;
+%    close all;
+
+end        

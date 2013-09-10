@@ -1,4 +1,4 @@
-function [Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA(Data, threshold, maxStates, flagDTW)
+function [Priors2, Mu, Sigma, evalIndex] = trainModelwithPCA(Data, threshold, maxStates, flagDTW, length)
 
 [nbVar,nbData] = size(Data);
 
@@ -11,12 +11,12 @@ nbPC = numPCA(Data(2:end, :), threshold);
 %DTW
 if flagDTW
     disp('Align raw_all with DTW.');
-    [w, new] = dtwMD([Data(:, 201:400)]', [Data(:,1:200)]');
-    Data(:,201:400) = new';
-    [w, new] = dtwMD([Data(:, 401:600)]', [Data(:,1:200)]');
-    Data(:,401:600) = new';
-    [w, new] = dtwMD([Data(:, 601:800)]', [Data(:,1:200)]'); 
-    Data(:,601:800) = new';
+    [w, new] = dtwMD([Data(:, length+1:2*length)]', [Data(:,1:length)]');
+    Data(:,length+1:2*length) = new';
+    [w, new] = dtwMD([Data(:, 2*length+1:3*length)]', [Data(:,1:length)]');
+    Data(:,2*length+1:3*length) = new';
+    [w, new] = dtwMD([Data(:, 3*length+1:4*length)]', [Data(:,1:length)]'); 
+    Data(:,3*length+1:4*length) = new';
 end
 
 %Re-center the data

@@ -7,13 +7,13 @@ function calModel()
     numDemo = 4;
     numDim = 14;    % 6 hand pos + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
 
-    % read raw data to .mat
- %   delete('data/*.mat');
- %   read2mat(path, numDemo, numDim);
+   % read raw data to .mat
+%    delete('data/*.mat');
+%    read2mat(path, numDemo, numDim);
     
     % assemble raw to one file raw_all, w/o DTW
-    flagDTW = 0;
-    length = 200;
+    flagDTW = 1;
+    length = 100;
     raw_all = assemble2one(path, numDemo, numDim, length, flagDTW);
     
     % queried by time
@@ -26,12 +26,12 @@ function calModel()
     fprintf('size of Data: [%d, %d]\n',nbVar, nbData);
 
     % Training model with PCA and BIC
-    maxStates = 6;
-    threshold = 0.95;
+    maxStates = 8;
+    threshold = 0.98;
 
     %queried by time
-    flagDTW = 1;
-    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates, flagDTW);
+    flagDTW = 0; 
+    [Priors, Mu, Sigma, evalIndex] = trainModelwithPCA([Data(1,:); Data(8:end,:)], threshold, maxStates, flagDTW, length);
     
     %save params
     save('data/Priors.mat', 'Priors');

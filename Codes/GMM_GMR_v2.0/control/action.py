@@ -17,7 +17,7 @@ def moveJoints(robot, action_name):
   
   #ballPos = [0.26, -0.20, 0.21]
   step = 1 
-  while (step < 272):
+  while (step < 100):
     print "step:  ", step
 
     '''
