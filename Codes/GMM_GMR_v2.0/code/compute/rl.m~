@@ -18,8 +18,8 @@ function Mu = rl()
     
     for i = 1 : 6
         %range(:, i) = segment(i);
-        range(:, 1) = Mu(1, i) - 5;
-        range(:, 2) = Mu(1, i) + 5;
+        range(1, i) = floor(Mu(1, i)) - 5;
+        range(2, i) = floor(Mu(1, i)) + 5;
     end
     
     a = unidrnd(nbAct); % value 1~8
@@ -28,12 +28,13 @@ function Mu = rl()
     Q = rand(nbSta, nbAct, nbGMM);
     e = zeros(size(Q));
             
-    for gmm = 5 : 5
+    %for gmm = 1 : 6
+    gmm = 1;
         total_step = 0;
         range(1, gmm)
         range(2, gmm)
 
-        for episode = 1 : 500
+        for episode = 1 : 1000
             follow = 0;
             fail = 0;
             for time = range(1, gmm) : range(2, gmm)
@@ -42,24 +43,15 @@ function Mu = rl()
                 m_row = 1+dof;
                 m_col = gmm;
                  if time == range(1,gmm)
-%                     a = unidrnd(nbAct);
-%                     Mu_new = takeAction(a, Mu, m_row, m_col);
                      s = readState(Mu, time, Jacobian, goal(time));                     
                      a = greedy(s, Q(:,:,gmm), total_step, nbAct);
-                     s
-                     Q(s,:,gmm)
-                     a
-                     
                  else
                     s = readState(Mu_new, time, Jacobian, goal(time));
                 end
                 Mu_new = takeAction(a, Mu, m_row, m_col);
                 s_new = readState(Mu_new, time, Jacobian, goal(time));
                 rwd = reward(s_new);
-
-           
-                
-                
+               
                 a_new = greedy(s_new, Q(:,:,gmm), total_step, nbAct);
                
                if rwd == 1
@@ -89,24 +81,25 @@ function Mu = rl()
 
                 if follow >= range(2, gmm) - range(1, gmm) -2
                     disp('Success !!!');
+                    solution(gmm) = a;
                     pause;
-                    plot(goal(range(1, gmm) : range(2, gmm)), 'r'); hold on;
                     
-                    for m = range(1, gmm) : range(2, gmm)
+                    for m = 1:200
                         t = GMRwithParam(m, [1], [2:9], Mu_new);
                         h(:, m) = testForwardKinect([t]', Jacobian);
                     end
-                    plot(h(3, range(1, gmm) : range(2, gmm)), '*'); hold on;
-                    close all;
-                    return;
-                end
-                
-                if fail > 0
+                    plot(goal, 'r'); hold on;
+                    plot(h(3,:), '*'); hold on;
+                    pause;
+                    %close all;
+                    gmm = gmm + 1;
+                    if gmm == 7
+                        return;
+                    end
                     break;
                 end
             end
         end
-    end
 end
 
 function best = greedy(s, Q, total_step, nbAct)
@@ -119,7 +112,13 @@ function best = greedy(s, Q, total_step, nbAct)
         best = a(unidrnd(size(a,2)));
         %pause;
     end
-    temperature = 1 / total_step;
+    if total_step <= 20
+        temperature = 1/
+    elseif total_step < 100 && total_step > 20
+        temperature = 1 / (total_step-19);
+    else
+        temperature = 1 / total_step;
+    end
     if rand(1,1) > epsilon * temperature || (total_step == 0)
 		return;
 	else
@@ -156,7 +155,7 @@ function state = readState(Mu, queryTime, Jacobian, goal)
             state = 1;          % good
         end
     else
-        if dist > 0.008         % too far, may not write down
+        if dist > 0.005         % too far, may not write down
             state = 3;
         elseif dist < -0.005    % too close, friction
             state = 2;

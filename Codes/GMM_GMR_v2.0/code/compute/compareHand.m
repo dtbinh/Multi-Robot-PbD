@@ -5,7 +5,7 @@ function hand = compareHand()
 
     gap = 0.0406;
     %s = [8,4,2,4,4,4];  %best
-    s = [1,1,3,1,4,8];
+    s = [8,4,4,4,4,4];
     for i = 1 : 6
         switch s(i)
             case 1
