@@ -10,6 +10,6 @@ function [hand, joint] = reproduce()
         hand(time, :) = testForwardKinect(joint(time, :), Jacobian);
     end
     
-    plot(hand(:,3));
+    %plot(hand(:,3));
     %save('../data/reproduce.mat', 'hand');
 end

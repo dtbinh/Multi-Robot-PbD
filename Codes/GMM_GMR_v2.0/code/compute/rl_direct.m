@@ -21,15 +21,15 @@ clear;
     action = 0; % 0, 1, -1
     state = [0, 0, 0]; % 0, 1, -1
     
-    %nbRange = 5;
-    %nbAct = 3;  % 3 actions: 1-stay, 2-increase, 3-decrease
+    nbRange = 5;
+    nbAct = 3;  % 3 actions: 1-stay, 2-increase, 3-decrease
     
     %params
 	gamma = 0.8;
     lambda = 0.1;
     alpha = 0.6;
    
-
+    nbState = 6;
     % initilize Q, e
     Q = rand([power(nbRange, nbState), power(nbAct, nbState)]);		% 5^6 * 3^6
     e = zeros(size(Q));
