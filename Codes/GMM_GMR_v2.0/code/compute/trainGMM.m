@@ -1,5 +1,5 @@
-function [solution, Q] = trainOneGMM(gmm, goal)
-   
+function [solution, Q] = trainGMM(gmm, goal)
+    solution = 0;
     load('../data/Mu.mat');
     Jacobian = forwardKinect();
     
@@ -68,14 +68,15 @@ function [solution, Q] = trainOneGMM(gmm, goal)
                 fprintf('Success !!! gmm %d', gmm);
                 solution = a;
                 solution
-                pause;
+                %pause;
                 return;
             end
 
             if step > 400
-                step = 0;
-                pause(1);
-                break;
+                solution = 0;
+                
+                %pause(1);
+                return;
             end
         end
         
@@ -91,7 +92,7 @@ function best = greedy(s, Q, total_step, nbAct)
     if size(a, 2) ~= 1 
         fprintf('Multiple max in Q: a %d, size of a %d\n', a, size(a));
         best = a(unidrnd(size(a,2)));
-        %pause;
+        %%pause;
     end
 
     
@@ -159,7 +160,7 @@ function r = reward(s_new)
 		r = 0;
 	else
 		disp('Illegal state');
-		pause;
+		%pause;
 		return;
 	end
 end

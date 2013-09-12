@@ -1,4 +1,4 @@
-function [solution, Q] = trainOneGMM(gmm, goal)
+function [solution, Q] = trainGMM(gmm, goal)
    
     load('../data/Mu.mat');
     Jacobian = forwardKinect();
@@ -75,7 +75,7 @@ function [solution, Q] = trainOneGMM(gmm, goal)
             if step > 400
                 step = 0;
                 pause(1);
-                break;
+                return;
             end
         end
         
