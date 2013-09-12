@@ -4,6 +4,9 @@ function result = segment(gmm)
         beta(:, step) = GMR_influence(step, [1], [2:9]);
     end
     
+for i = 1 : 6    
+    plot(beta(i,:)); hold on;
+end
     j = 1;
     for step = 1 : 200
         if beta(gmm ,step) > 0.9
