@@ -1,38 +1,31 @@
-function sol_test = testRL(goal, Q)
+function a = testRL(goal, Q, Mu)
                 
     load('../data/Mu.mat');
-    Jacobian = forwardKinect();
+        Jacobian = forwardKinect();
 
     dof = 1;
-    Mu_new = Mu;
+    
     for gmm = 1 : 6
         m_row = 1+dof;
         m_col = gmm;
         
-        nbAct = 50;
+        nbAct = 8;
     
         range(1) = floor(Mu(1, gmm)) - 3;
         range(2) = floor(Mu(1, gmm)) + 3;
     
-        s = readState(Mu_new, range(1), Jacobian, goal);
-        a = greedy(s, Q(:,:,gmm), 100000000, nbAct);
+        s = readState(Mu, range(1), Jacobian, goal);
+        a = greedy(s, Q(:,:), 100000000, nbAct);
     
-        Mu_new = takeAction(a, Mu_new, m_row, m_col, nbAct);
-        sol_test(gmm) = a;
+        Mu = takeAction(a, Mu, m_row, m_col);
     end
         for time = 1 : 200
-            joint = GMRwithParam(time, 1, [2:9], Mu); 
-            joint_new = GMRwithParam(time, 1, [2:9], Mu_new);
-
+            joint = GMRwithParam(time, 1, [2:9], Mu);  
             hand(time, :) = testForwardKinect([joint]', Jacobian);
-            hand_new(time, :) = testForwardKinect([joint_new]', Jacobian);
         end
     
         plot(goal*ones(1,200), 'r'); hold on;
-        plot(goal*ones(1,200)+0.008, 'r-.'); 
-        plot(goal*ones(1,200)-0.008, 'r-.');grid on;
-        plot(hand(:,3), 'g');
-        plot(hand_new(:,3), '*')
+        plot(hand(:,3), '*');
 
 end
 
@@ -94,13 +87,12 @@ function state = readState(Mu, queryTime, Jacobian, goal)
     end
 end
 
-function Mu_new = takeAction(a, Mu, row, col, nbAct)
+function Mu_new = takeAction(a, Mu, row, col)
    Mu_new = Mu;
    if a == 1
        a = 0;
-   elseif a == nbAct
+   elseif a == 8
        a = -1;
    end
-   %gap = (max(Mu(row,:)) - min(Mu(row,:)) )/6;
-   Mu_new(row, col) = Mu(row, col) + a * 0.01;
+   Mu_new(row, col) = Mu(row, col) + a * 0.0406;
 end

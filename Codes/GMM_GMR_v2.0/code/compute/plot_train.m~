@@ -1,18 +1,18 @@
-%function hand = compareHand(s)
-function hand = compareHand()
+
+function hand = plot_train(s, nbAct, goal)
     load('../data/Mu.mat');
     Mu_new = Mu;
 
     %gap = 0.04;
     %gap = (max(Mu(2,:)) - min(Mu(2,:)) )/6;
     gap = 0.01;
-    %s = [8,4,2,4,4,4];  %best
+    
     s = [2,3,2,4,3,12];
     for i = 1 : 6
         switch s(i)
             case 1
                 s(i) = 0;
-            case 50
+            case nbAct
                 s(i) = -1;
         end
     end
@@ -39,7 +39,7 @@ function hand = compareHand()
 
     end
     %goal = hand_std(:, 3) - 0.03;
-        goal = (mean(hand_std(80:100, 3)) - 0.02) * ones(1, 200);
+    %    goal = (mean(hand_std(80:100, 3)) - 0.02) * ones(1, 200);
     %goa = 0.3288 * ones(1, 200);
 
     diff = hand_new(:,3) - hand_std(:,3);

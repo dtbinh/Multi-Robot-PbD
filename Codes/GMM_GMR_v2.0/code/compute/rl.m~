@@ -1,4 +1,4 @@
-function [solution, Q] = rl()
+function [sol_train, Q] = rl()
     clc;
     clear;
     load('../data/Mu.mat');
@@ -7,23 +7,18 @@ function [solution, Q] = rl()
     hand_std = zeros(length, 6);
     for time = 1 : length
         joint = GMRwithParam(time, 1, [2:9], Mu);
-        
         hand_std(time, :) = testForwardKinect([joint]', Jacobian);
-
     end
     
     goal = mean(hand_std(80:100, 3)) - 0.02;
+    goal
     
-    
-    %[bestMu, Q] = trainAllGMM(goal);
-    %    solution = testRL(gmm, goal-0.01, Q(:,:,gmm))
-    
-    solution = zeros(1, 6);
+    sol_train = zeros(1, 6);
     gmm = 1;
         
     while(1)
-           [solution(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
-            if solution(gmm) ~= 0 
+           [sol_train(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
+            if sol_train(gmm) ~= 0 
                 %success, go to next gmm
                 gmm = gmm + 1;
                 if gmm == 7
@@ -31,5 +26,7 @@ function [solution, Q] = rl()
                 end
 
             end
-        end
+    end
+    
+    plotTrain(sol_train);
  end

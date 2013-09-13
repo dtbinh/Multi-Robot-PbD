@@ -1,4 +1,4 @@
-function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
+function [solution, Q, accum_rwd] = trainGMM(gmm, goal, nbAct)
     solution = 0;
     
     load('../data/Mu.mat');
@@ -9,13 +9,13 @@ function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
     alpha = 0.6;
     
     nbGMM = 6;
-    nbAct = 8;
+    %nbAct = 12;
     nbSta = 3;
     dof = 1;
 
     for i = 1 : nbGMM
-        range(1, i) = floor(Mu(1, i)) - 3;
-        range(2, i) = floor(Mu(1, i)) + 3;
+        range(1, i) = floor(Mu(1, i)) - 5;
+        range(2, i) = floor(Mu(1, i)) + 5;
     end
     
     a = unidrnd(nbAct); % value 1~8
@@ -29,6 +29,7 @@ function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
     total_rwd = 0;
     for episode = 1 : 2000
         follow = 0;
+        step = 0;
         for time = range(1, gmm) : range(2, gmm)
             total_step = total_step + 1;
             step = step + 1;
@@ -42,7 +43,7 @@ function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
              else
                 s = readState(Mu_new, time, Jacobian, goal);
             end
-            Mu_new = takeAction(a, Mu, m_row, m_col);
+            Mu_new = takeAction(a, Mu, m_row, m_col, nbAct);
             s_new = readState(Mu_new, time, Jacobian, goal);
             rwd = reward(s_new);
             total_rwd = total_rwd + rwd;
@@ -65,16 +66,11 @@ function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
             s = s_new;
             a = a_new;
 
-            if follow >= range(2, gmm) - range(1, gmm) -2
+            follow
+            if follow >= 20 % +range(2, gmm) - range(1, gmm)
                 fprintf('Success !!! gmm %d', gmm);
                 solution = a;
                return;
-            end
-            
-            if step > 499 
-                
-                disp('Fail');
-                return;
             end
         end
     end
@@ -90,14 +86,14 @@ function best = greedy(s, Q, total_step, nbAct)
         best = a(unidrnd(size(a,2)));
     end
     
-    if total_step < 200 && total_step > 0
-        if total_step ~= 1
-            temperature = 1 / (total_step-1);
-        else
-            temperature = 1 / total_step;
-        end
-    elseif total_step == 1
-        temperature = 2/3;
+    if total_step == 1
+        temperature = 1/3;
+    elseif total_step < 10
+        temperature = 1 / 5;
+    elseif total_step < 20
+        temperature = 1 / 10;
+    elseif total_step < 50
+        temperature = 1/25;
     else
         temperature = 1 / total_step;
     end
@@ -113,16 +109,13 @@ function best = greedy(s, Q, total_step, nbAct)
     end
 end
 
-function Mu_new = takeAction(a, Mu, row, col)
+function Mu_new = takeAction(a, Mu, row, col, nbAct)
    Mu_new = Mu;
-   if a == 1
-       a = 0;
-   elseif a == 8
-       a = -1;
-   end
+  
+   a = a - floor(nbAct/3);
    
-   gap = (max(Mu_new(row,:)) - min(Mu(row,:)) )/6;
-   Mu_new(row, col) = Mu(row, col) + a * gap; %0.0406
+   %gap = (max(Mu(row,:)) - min(Mu(row,:)) )/6;
+   Mu_new(row, col) = Mu(row, col) + a * 0.01; %0.0406
 end
 
 function state = readState(Mu, queryTime, Jacobian, goal)
@@ -131,12 +124,16 @@ function state = readState(Mu, queryTime, Jacobian, goal)
     
     dist = hand(3) - goal;
     if queryTime < 32 || queryTime > 172
-        if dist > 0.005 * 10    % too far
-            state = 3;  
-        elseif dist < 0         % too close, touch board
+        if dist > 0.005 * 20    % too far
+            state = 5
+        elseif dist > 0.005 * 10 % far
+            state = 4;  
+        elseif dist <= 0.005 * 10 && dist > 0.005 * 2 % good
+            state = 3;
+        elseif dist <= 0.005 *2  % close
             state = 2;
         else
-            state = 1;          % good
+            state = 1;          % too close
         end
     else
         if dist > 0.005         % too far, may not write down
