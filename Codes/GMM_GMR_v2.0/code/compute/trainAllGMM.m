@@ -1,4 +1,4 @@
-function [solution, Q] = trainAllg_max(goal)
+function [solution, Q] = trainAllg_max()
     solution = zeros(1,6);
     load('../data/Mu.mat');
     Jacobian = forwardKinect();
@@ -12,6 +12,7 @@ function [solution, Q] = trainAllg_max(goal)
     nbSta = 3;
     dof = 1;
     
+    goal = 0.32;
     
     a = unidrnd(nbAct); % value 1~8
     
@@ -25,79 +26,77 @@ function [solution, Q] = trainAllg_max(goal)
     follow = 0;
     g_max_counter = 0;
     g_max_follow = 0;
-   
     for episode = 1 : 2000
-        for time = 1 : 80
-            [beta, g_max] = responsibility(time);
-            
-            if beta(g_max) > 0.98
-             
-            total_step = total_step + 1;
-            fprintf('episode %d, total_step %d, g_max %d, time %d\n', episode,total_step, g_max, time);
-            m_row = 1+dof;
-            m_col = g_max;
-            
-            if solution(g_max) ~=0
-                disp('already trained');
+        g_max_old = 1;
+        for time = 1 : 200
+            [beta, g_max] = responsibility(time);            
+            if beta(g_max) < 0.99 || solution(g_max) ~=0
+                disp('already trained or not confident');
             else
-             % New GMM
-             if time == 1 || g_max ~= g_max_old
-                  % check if last GMM trained
-                  if g_max_follow >= g_max_counter && g_max_follow ~= 0                    
-                     fprintf('Success in GMM%d. best a=%d, follow %d', g_max_old, a, g_max_follow);
-                     solution(g_max) = a;
-                     solution
-                     if all(solution) ~= 0
-                         solution
-                         return;
-                     end
-                     pause;
-                  end
-                  %initialize current g_max data
-                  g_max_counter = 0;
-                  g_max_follow = 0;
-                  
-                  % initialize s, a
-                  s = readState(Mu, time, Jacobian, goal);                     
-                  %a = greedy(s, Q(:,:, g_max), g_max_counter, nbAct);
-                  a = unidrnd(nbAct);
-             end
-             
-            
-            Mu_new = takeAction(a, Mu, m_row, m_col);
-            s_new = readState(Mu_new, time, Jacobian, goal);
-            rwd = reward(s_new);
+                total_step = total_step + 1;
+                fprintf('episode %d, total_step %d, g_max %d, time %d\n', episode,total_step, g_max, time);
+                m_row = 1+dof;
+                m_col = g_max;
+                % New GMM
+                if g_max ~= g_max_old
+                    % check if last GMM trained
+                    if g_max_follow == g_max_counter && g_max_counter ~= 0                    
+                             fprintf('Success in GMM%d. best a=%d, follow %d', g_max_old, a, g_max_follow);
+                             solution(g_max) = a;
+                             solution
+                             if all(solution) ~= 0
+                                 solution
+                                 return;
+                             end
+                             pause;
+                    end
 
-            a_new = greedy(s_new, Q(:,:, g_max), g_max_counter, nbAct);
+                          % train a new GMM, initialize current g_max data
+                          g_max_counter = 0;
+                          g_max_follow = 0;
 
-           g_max_counter = g_max_counter + 1;
-           if rwd == 1
-                follow = follow + 1;
-                g_max_follow = g_max_follow+1;
-            else
-                follow = 0;
-                g_max_follow = 0;
-           end
-            %g_max_counter
-            %g_max_follow
-            delta = rwd + gamma * Q(s_new, a_new, g_max) - Q(s, a, g_max);
-            e(s, a, g_max) = e(s, a, g_max) + 1; 
-            % update Q, e
-            for i = 1 : 6
-                Q(:,:, i) = Q(:,:,i) + alpha * delta * e(:,:,i) * beta(i);
-                e(:,:, i) = gamma * lambda * e(:,:,i) * beta(i);
-            end
-            s = s_new;
-            a = a_new;
+                          % initialize s, a
+                          s = readState(Mu, time, Jacobian, goal);                     
+                          a = greedy(s, Q(:,:, g_max), g_max_counter, nbAct);
+                          %a = unidrnd(nbAct);
+                          
+                % in old GMM
+                else
+                        s = readState(Mu_new, time, Jacobian, goal);
+                end
 
+
+                    Mu_new = takeAction(a, Mu, m_row, m_col);
+                    s_new = readState(Mu_new, time, Jacobian, goal);
+                    rwd = reward(s_new);
+
+                   a_new = greedy(s_new, Q(:,:, g_max), g_max_counter, nbAct);
+
+                   if rwd == 1
+                        follow = follow + 1;
+                        g_max_follow = g_max_follow+1;
+                        g_max_counter = g_max_counter + 1;
+
+                    else
+                        follow = 0;
+                        g_max_follow = 0;
+                        g_max_counter = g_max_counter + 1;
+                   end
+
+
+                    delta = rwd + gamma * Q(s_new, a_new, g_max) - Q(s, a, g_max);
+                    e(s, a, g_max) = e(s, a, g_max) + 1; 
+                    % update Q, e
+                    for i = 1 : 6
+                        Q(:,:, i) = Q(:,:,i) + alpha * delta * e(:,:,i) * beta(i);
+                        e(:,:, i) = gamma * lambda * e(:,:,i) * beta(i);
+                    end
+                    s = s_new;
+                    a = a_new;
+
+                    g_max_old = g_max;
+                end
             
-            g_max_follow
-            g_max_counter
-            
-            g_max_old = g_max;
-        end
-        
-            end
         end
     end
 end

@@ -1,4 +1,4 @@
-function solution = rl()
+function [solution, Q, bad] = rl()
     clc;
     clear;
     goal = 0.32;
@@ -6,9 +6,40 @@ function solution = rl()
     %[bestMu, Q] = trainAllGMM(goal);
     %    solution = testRL(gmm, goal-0.01, Q(:,:,gmm))
     
-   for i = 1 : 100
-       for gmm = 1  : 6
-        [solution(gmm), Q(:,:, gmm)] = trainGMM(gmm, goal);
-       end
-   end
+    solution = zeros(1, 6);
+    gmm = 1;
+    
+    j = 1;
+
+%     while(1)
+%         for times = 1 : 10
+%             [solution(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
+%        
+%             plot(one_rwd); hold on;
+% 
+%             bad(gmm, j) = solution(gmm); 
+%             j = j + 1;
+%            
+%         
+%             
+%             if solution(gmm) ~= 0 
+% 
+%                 %success, go to next gmm
+%                 gmm = gmm + 1;
+%                 if gmm == 7
+%                     return;
+%                 end
+% 
+%             end
+%         end
+%     end
+    coounter = 0;
+    while (1)
+        [sol, Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
+        if sol ~= 0
+            counter = counter + 1;
+        end
+    end
+
 end
+

@@ -1,5 +1,6 @@
-function [solution, Q] = trainGMM(gmm, goal)
+function [solution, Q, accum_rwd] = trainGMM(gmm, goal)
     solution = 0;
+    
     load('../data/Mu.mat');
     Jacobian = forwardKinect();
     
@@ -11,8 +12,8 @@ function [solution, Q] = trainGMM(gmm, goal)
     nbAct = 8;
     nbSta = 3;
     dof = 1;
-    
-    for i = 1 : 6
+
+    for i = 1 : nbGMM
         range(1, i) = floor(Mu(1, i)) - 3;
         range(2, i) = floor(Mu(1, i)) + 3;
     end
@@ -25,9 +26,9 @@ function [solution, Q] = trainGMM(gmm, goal)
             
     total_step = 0;
     step = 0;
+    total_rwd = 0;
     for episode = 1 : 2000
         follow = 0;
-        fail = 0;
         for time = range(1, gmm) : range(2, gmm)
             total_step = total_step + 1;
             step = step + 1;
@@ -44,15 +45,15 @@ function [solution, Q] = trainGMM(gmm, goal)
             Mu_new = takeAction(a, Mu, m_row, m_col);
             s_new = readState(Mu_new, time, Jacobian, goal);
             rwd = reward(s_new);
-
+            total_rwd = total_rwd + rwd;
+            accum_rwd(total_step) = total_rwd / total_step;
+            
             a_new = greedy(s_new, Q(:,:), total_step, nbAct);
 
            if rwd == 1
                 follow = follow + 1;
-                fail = 0;
             else
                 follow = 0;
-                fail = 1;
             end
             
             delta = rwd + gamma * Q(s_new, a_new) - Q(s, a);
@@ -67,20 +68,15 @@ function [solution, Q] = trainGMM(gmm, goal)
             if follow >= range(2, gmm) - range(1, gmm) -2
                 fprintf('Success !!! gmm %d', gmm);
                 solution = a;
-                solution
-                %pause;
-                return;
+               return;
             end
-
-            if step > 400
-                solution = 0;
+            
+            if step > 499 
                 
-                %pause(1);
+                disp('Fail');
                 return;
             end
         end
-        
-
     end
 end
 
@@ -92,9 +88,7 @@ function best = greedy(s, Q, total_step, nbAct)
     if size(a, 2) ~= 1 
         fprintf('Multiple max in Q: a %d, size of a %d\n', a, size(a));
         best = a(unidrnd(size(a,2)));
-        %%pause;
     end
-
     
     if total_step < 200 && total_step > 0
         if total_step ~= 1
@@ -102,6 +96,8 @@ function best = greedy(s, Q, total_step, nbAct)
         else
             temperature = 1 / total_step;
         end
+    elseif total_step == 1
+        temperature = 2/3;
     else
         temperature = 1 / total_step;
     end
@@ -160,7 +156,6 @@ function r = reward(s_new)
 		r = 0;
 	else
 		disp('Illegal state');
-		%pause;
 		return;
 	end
 end

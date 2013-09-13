@@ -1,7 +1,15 @@
 function [solution, Q, bad] = rl()
     clc;
     clear;
-    goal = 0.32;
+    
+    for run = 1 : 10
+        one_run();
+    end
+end
+
+
+function one_run()
+goal = 0.32;
 
     %[bestMu, Q] = trainAllGMM(goal);
     %    solution = testRL(gmm, goal-0.01, Q(:,:,gmm))
@@ -11,8 +19,8 @@ function [solution, Q, bad] = rl()
     
     j = 1;
     color = {'k', 'b', 'r', 'g', 'm', 'c'};
+    
     while(1)
-        for times = 1 : 10
             [solution(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
        
 %             plot(one_rwd); hold on;
@@ -22,7 +30,9 @@ function [solution, Q, bad] = rl()
 %            
                   
             if solution(gmm) ~= 0 
-                plot(one_rwd, 'color', color{gmm}); hold on;
+                plot(one_rwd, 'color', color{gmm}, 'LineWidth', 3); hold on;
+                legend('G1', 'G2', 'G3', 'G4', 'G5', 'G6');
+                legend boxoff;
                 %success, go to next gmm
                 gmm = gmm + 1;
                 if gmm == 7
@@ -30,7 +40,7 @@ function [solution, Q, bad] = rl()
                 end
 
             end
-        end
+        
     end
 %     counter = 0;
 %     gmm = 1;
