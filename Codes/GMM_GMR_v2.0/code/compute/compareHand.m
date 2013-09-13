@@ -3,9 +3,10 @@ function hand = compareHand()
     load('../data/Mu.mat');
     Mu_new = Mu;
 
-    gap = 0.0406;
+    %gap = 0.04;
+    gap = (max(Mu_new(2,:)) - min(Mu(2,:)) )/6;
     %s = [8,4,2,4,4,4];  %best
-    s = [8,5,1,5,5,6];
+    s = [2,8,2,2,2,8];
     for i = 1 : 6
         switch s(i)
             case 1
@@ -36,8 +37,9 @@ function hand = compareHand()
         hand_new(time, :) = testForwardKinect([joint_new]', Jacobian);
 
     end
-    goal = hand_std(:, 3) - 0.02345;
-    
+    %goal = hand_std(:, 3) - 0.03;
+        goal = (mean(hand_std(80:100, 3)) - 0.03) * ones(1, 200);
+
     diff = hand_new(:,3) - hand_std(:,3);
     
     s

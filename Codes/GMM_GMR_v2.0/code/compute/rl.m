@@ -1,28 +1,29 @@
-function [solution, Q, bad] = rl()
+function [solution, Q] = rl()
     clc;
     clear;
-    goal = 0.32;
+    load('../data/Mu.mat');
+    length = 200;
+    Jacobian = forwardKinect();
+    hand_std = zeros(length, 6);
+    for time = 1 : length
+        joint = GMRwithParam(time, 1, [2:9], Mu);
+        
+        hand_std(time, :) = testForwardKinect([joint]', Jacobian);
 
+    end
+    
+    goal = mean(hand_std(80:100, 3)) - 0.03;
+    
+    
     %[bestMu, Q] = trainAllGMM(goal);
     %    solution = testRL(gmm, goal-0.01, Q(:,:,gmm))
     
     solution = zeros(1, 6);
     gmm = 1;
-    
-    j = 1;
-    color = {'k', 'b', 'r', 'g', 'm', 'c'};
+        
     while(1)
-        for times = 1 : 10
-            [solution(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
-       
-%             plot(one_rwd); hold on;
-% 
-%             bad(gmm, j) = solution(gmm); 
-%             j = j + 1;
-%            
-                  
+           [solution(gmm), Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
             if solution(gmm) ~= 0 
-                plot(one_rwd, 'color', color{gmm}); hold on;
                 %success, go to next gmm
                 gmm = gmm + 1;
                 if gmm == 7
@@ -31,20 +32,4 @@ function [solution, Q, bad] = rl()
 
             end
         end
-    end
-%     counter = 0;
-%     gmm = 1;
-%     
-%     while (1)
-%         [sol, Q(:,:, gmm), one_rwd] = trainGMM(gmm, goal);
-%         if sol ~= 0
-%             plot(one_rwd); hold on;
-%             counter = counter + 1;
-%             if counter == 10
-%                 return ;
-%             end
-%         end
-%     end
-
-end
-
+ end

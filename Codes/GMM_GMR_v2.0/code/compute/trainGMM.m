@@ -120,7 +120,9 @@ function Mu_new = takeAction(a, Mu, row, col)
    elseif a == 8
        a = -1;
    end
-   Mu_new(row, col) = Mu(row, col) + a * 0.0406;
+   
+   gap = (max(Mu_new(row,:)) - min(Mu(row,:)) )/6;
+   Mu_new(row, col) = Mu(row, col) + a * gap; %0.0406
 end
 
 function state = readState(Mu, queryTime, Jacobian, goal)

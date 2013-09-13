@@ -7,6 +7,9 @@ def moveJoints(robot, action_name):
   robot.fixLegs()
   robot.motion.setStiffnesses("Body", 1.0)
   
+  filename = "../data/" + action_name + "_reproduced"  
+  f = open(filename, 'w+')
+
   step = 1 
   while (step < 201):
     print "step:  ", step
@@ -27,6 +30,10 @@ def moveJoints(robot, action_name):
       names  = ["RArm", "LHipPitch", "RHipPitch"]
       robot.motion.setStiffnesses(names, 1.0)
       robot.motion.angleInterpolationWithSpeed(names, joints, maxSpeedFraction)
-      step = step + 1    
+      step = step + 1   
+      
+      SensorData = str(robot.HandData()) + '\n'
+      f.write(SensorData)
+
     if robot.headTouch():
       break
