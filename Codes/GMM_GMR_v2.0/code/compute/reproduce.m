@@ -1,4 +1,4 @@
-function [hand, joint] = reproduce()
+function [hand, joint] = reproduce(Mu)
     length = 200;
 
     Jacobian = forwardKinect();
@@ -6,7 +6,7 @@ function [hand, joint] = reproduce()
     joint = zeros(length, 8);
     
     for time = 1 : length
-        joint(time, :) = GMR(time, 1, [2:9]);
+        joint(time, :) = GMRwithParam(time, 1, [2:9], Mu);
         hand(time, :) = testForwardKinect(joint(time, :), Jacobian);
     end
     

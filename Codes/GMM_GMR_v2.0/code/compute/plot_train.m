@@ -1,5 +1,5 @@
 
-function hand = plot_train(s, nbAct, goal)
+function hand = plot_train(goal, s, nbAct)
     load('../data/Mu.mat');
     Mu_new = Mu;
 

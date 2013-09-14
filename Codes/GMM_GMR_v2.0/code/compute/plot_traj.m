@@ -4,17 +4,17 @@ length = 200;
     t1 = 32;
     t2 = 172;
     
-%figure;
-%plot3(realHand2(:, 1), realHand2(:, 2), realHand(:, 3),'r');hold on;
-%plot3(realHand2(t1:t2, 1), realHand2(t1:t2, 2), realHand(t1:t2,
-%3),'r');hold on;
-% grid on;
-
-% for i = 3 : 3
+% 
+% for i = 1 : 3
 %     figure;
 %     plot(realHand2(:,i)); hold on; plot(realHand(:,i), 'g');
 % 
-% end
+% end    
+% figure;
+% plot3(realHand2(:, 1), realHand2(:, 2), realHand(:, 3),'r');hold on;
+% plot3(realHand2(t1:t2, 1), realHand2(t1:t2, 2), realHand(t1:t2,3),'r');hold on;
+% grid on;
+
     
     Jacobian = forwardKinect();
     hand = zeros(length, 6);
@@ -39,10 +39,10 @@ grid on;
     
     %plot(hand(:, 3), 'r')
     
-%     %simulated 2D -N parte only
-%     figure;
-%     plot(hand(t1:t2, 1), 'r');hold on;
-%     figure;
-%     plot(hand(t1:t2, 2), 'g');
-%     figure;
-%     plot(hand(t1:t2, 3), 'b');grid on;
+    %simulated 2D -N parte only
+    figure;
+    plot(hand(t1:t2, 1), 'r');hold on;
+    figure;
+    plot(hand(t1:t2, 2), 'g');
+    figure;
+    plot(hand(t1:t2, 3), 'b');grid on;

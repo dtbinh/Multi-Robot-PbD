@@ -62,8 +62,8 @@ function hand = compareHand()
     
     
     grid on; 
-    xlabel('hand_1');
-    ylabel('hand_2');
-    zlabel('hand_3');
+    xlabel('x', 'fontsize', 40);
+    ylabel('y', 'fontsize', 40);
+    zlabel('z', 'fontsize', 40);
     
 end

@@ -27,6 +27,6 @@ function [sol_train, Q] = rl()
 
             end
         end
-        plot_train(sol_train, nbAct, goal);
+        plot_train(goal, sol_train, nbAct);
 
  end
