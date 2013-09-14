@@ -3,19 +3,14 @@ function hand = compareHand()
     load('../data/Mu.mat');
     Mu_new = Mu;
 
-    %gap = 0.04;
-    %gap = (max(Mu(2,:)) - min(Mu(2,:)) )/6;
     gap = 0.01;
-    %s = [8,4,2,4,4,4];  %best
-    s = [2,3,2,4,3,12];
-    for i = 1 : 6
-        switch s(i)
-            case 1
-                s(i) = 0;
-            case 50
-                s(i) = -1;
-        end
-    end
+    %gap = (max(Mu(2,:)) - min(Mu(2,:)) )/6;
+    %gap = 0.01;
+    s = [8,4,2,4,4,4];  %best
+%     s = [2,3,2,4,3,12];
+%     for i = 1 : 6
+%        s(i) = s(i) - nb
+%     end
     
     Mu_new(2, 1) = Mu(2, 1) + s(1) * gap;
     Mu_new(2, 2) = Mu(2, 2) + s(2) * gap;
