@@ -25,8 +25,8 @@ def record(argv):
     ballPos = robot.BallData()
     sleep(1) 
 
-  robot.motion.setStiffnesses("RHipPitch", 0.0)
-  robot.motion.setStiffnesses("LHipPitch", 0.0)
+  #robot.motion.setStiffnesses("RHipPitch", 0.0)
+  #robot.motion.setStiffnesses("LHipPitch", 0.0)
   
   count = 0
   while not (robot.headTouch()):

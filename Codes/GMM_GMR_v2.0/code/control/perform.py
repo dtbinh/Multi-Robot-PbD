@@ -20,12 +20,13 @@ if __name__ == "__main__":
   
   #robot.fixLegs()
   #moveHand(robot) 
-  moveJoints(robot, action_name) 
+  #moveJoints(robot, action_name) 
    
   # test scripts
+  #test_handpos(robot)
   #test_moveJoints(robot)
   #test_closeHand(robot)
   #test_handpos(robot)
-  #test_ForwardKinect(robot)
-
+  test_ForwardKinect(robot)
+  #test_robotInfo(robot)
   robot.exit()

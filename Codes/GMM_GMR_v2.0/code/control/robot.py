@@ -52,7 +52,7 @@ class ROBOT():
 
   def HandData(self):
     # 0-torso, 1-world, 2-robot
-    space = 2 
+    space = 0 
     useSensorValues = True
     # 6 DOF: 3 position and 3 orientation
     #return self.motion.getPosition(self.side+"Arm", space, useSensorValues)

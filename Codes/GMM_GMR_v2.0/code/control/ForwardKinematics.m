@@ -20,7 +20,9 @@ function [result1, result2] = ForwardKinematics(thetasR)
 
     result1 = fRightHand(thetasR);
     result2 = my_fRightHand(thetasR);
-    size(thetasR)
+
+    result2(1:3) = result2(1:3)/1000;
+    result1(1:3) = result1(1:3)/1000;
 end
 
 
