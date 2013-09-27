@@ -43,10 +43,10 @@ class ROBOT():
     WristYaw = self.memory.getData('Device/SubDeviceList/'+self.side+'WristYaw/Position/Sensor/Value')
     Hand = self.memory.getData('Device/SubDeviceList/'+self.side+'Hand/Position/Sensor/Value')
     # LHipYawPitch and RHipYawPitch share the same motor
-    LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
-    RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
-    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
-    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
+    #LHipPitch = self.memory.getData('Device/SubDeviceList/LHipPitch/Position/Sensor/Value')
+    #RHipPitch = self.memory.getData('Device/SubDeviceList/RHipPitch/Position/Sensor/Value')
+    #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand, LHipPitch, RHipPitch]
+    result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw, Hand]
     #result = [ShoulderPitch, ShoulderRoll, ElbowYaw, ElbowRoll, WristYaw]
     return result 
 
@@ -64,8 +64,8 @@ class ROBOT():
 
   def fixLegs(self):
     self.motion.setStiffnesses("Body", 0.0)
-    RLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
-    LLeg = [0.06, 0.0, -1.30, 0.74, 0.43, 0.0]
+    RLeg = [0.06, 0.0, -1.10, 0.74, 0.43, 0.0]
+    LLeg = [0.06, 0.0, -1.10, 0.74, 0.43, 0.0]
     timeLists = 2.0
     isAbsolute = True
     

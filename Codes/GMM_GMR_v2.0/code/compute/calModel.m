@@ -5,11 +5,11 @@ function hand = calModel()
     
     path = '../data/';
     numDemo = 4;
-    numDim = 14;    % 6 hand pos + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
+    numDim = 12;    % 6 hand pos + 8 joint angles (RSholderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RwristYaw, RHand, LHip, RHip)
 
     %% Step 1: read raw data to .mat
-%    delete([path, '*.mat']);
-%    read2mat(path, numDemo, numDim);
+    delete([path, '*.mat']);
+    read2mat(path, numDemo, numDim);
     
     %% Step 2: assemble raw to raw_all to the same length
     length = 200;
