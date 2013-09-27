@@ -45,3 +45,4 @@ for n=1:nbVar2-1
 
 end
 %print('-depsc2','data/GMM-latentSpace-graph01.eps');
+
