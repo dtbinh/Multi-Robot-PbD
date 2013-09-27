@@ -13,6 +13,8 @@ if __name__ == "__main__":
     robot_ip = "10.26.210.60"
   elif robot_name == "bumblebee":
     robot_ip = "10.26.210.59"
+  elif robot_name == "jazz":
+    robot_ip = "10.26.210.61"
   else:
     robot_ip = "lap77.local"
  

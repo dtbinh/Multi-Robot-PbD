@@ -87,6 +87,7 @@ def test_getAngles(robot):
     print names, ":  ", sensorAngles
    
 def test_ForwardKinect(robot):
+  #robot.fixLegs()
   while not robot.headTouch():
     joint = robot.JointData()
     #print "joint: ", joint
@@ -104,7 +105,7 @@ def test_ForwardKinect(robot):
 
     print "percent_diff: ", percent_diff, "------\n"
     print "diff: ", diff, "\n\n"
-    sleep(3)
+    sleep(2)
 
 def test_robotInfo(robot):
     robotConfig = robot.motion.getRobotConfig()

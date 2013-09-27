@@ -1,4 +1,4 @@
-function [result1, result2] = ForwardKinematics(thetasR)
+function result2 = ForwardKinematics(thetasR)
 %     close all;
 %     clc;
 
@@ -53,7 +53,7 @@ function [right] = my_fRightHand(thetas)
     Tendend = base*T1*T2*T3*T4*T5*Tend*Rofl(0,0,-pi);
     rotZ = atan2(Tendend(2,1),Tendend(1,1));
     rotY = atan2(-Tendend(3,1),sqrt(Tendend(3,2)^2 + Tendend(3,3)^2));
-    rotX = atan2(Tendend(3,2),Tendend(3,3));
+    rotX = -atan2(Tendend(3,2),Tendend(3,3));
     right = [Tendend(1:3,4);rotX;rotY;rotZ];
 end
 
@@ -79,7 +79,7 @@ function [right] = fRightHand(thetas)
     Tend1(1,4) = -HandOffsetX-LowerArmLength;
     R = Rofl(0,0,pi/2);
     Tend = R*Tend1;
-    Tendend = base*T1*T2*T3*T4*Tend*Rofl(0,0,-pi);
+    Tendend = base*T1*T2*T3*T4*Tend*Rofl(0,0,pi);
     rotZ = atan2(Tendend(2,1),Tendend(1,1));
     rotY = atan2(-Tendend(3,1),sqrt(Tendend(3,2)^2 + Tendend(3,3)^2));
     rotX = atan2(Tendend(3,2),Tendend(3,3));
